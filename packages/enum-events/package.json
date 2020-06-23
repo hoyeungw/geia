@@ -1,6 +1,6 @@
 {
   "name": "@geia/enum-events",
-  "version": "0.0.4",
+  "version": "0.0.0",
   "description": "Enum of events",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
