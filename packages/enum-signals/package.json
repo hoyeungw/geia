@@ -1,0 +1,32 @@
+{
+  "name": "@geia/enum-signals",
+  "version": "0.0.4",
+  "description": "Enum of signals",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "pub": "npm publish",
+    "test": "node -r @babel/register test/test.index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoyeungw/geia.git"
+  },
+  "keywords": [
+    "geia",
+    "signals",
+    "constants"
+  ],
+  "author": "Hoyeung Wong",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hoyeungw/geia"
+  },
+  "homepage": "https://github.com/hoyeungw/geia#readme"
+}

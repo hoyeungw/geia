@@ -1,0 +1,98 @@
+const 
+/* 1   */
+SIGHUP = 'SIGHUP',
+
+/* 2   */
+SIGINT = 'SIGINT',
+      // Ctrl-C
+
+/* 3   */
+SIGQUIT = 'SIGQUIT',
+      // Ctrl-\
+
+/* 4   */
+SIGILL = 'SIGILL',
+
+/* 5   */
+SIGTRAP = 'SIGTRAP',
+
+/* 6   */
+SIGABRT = 'SIGABRT',
+
+/* 7   */
+SIGBUS = 'SIGBUS',
+
+/* 8   */
+SIGFPE = 'SIGFPE',
+
+/* 9   */
+SIGKILL = 'SIGKILL',
+
+/* 10  */
+SIGUSR1 = 'SIGUSR1',
+
+/* 11  */
+SIGSEGV = 'SIGSEGV',
+
+/* 12  */
+SIGUSR2 = 'SIGUSR2',
+
+/* 13  */
+SIGPIPE = 'SIGPIPE',
+
+/* 14  */
+SIGALRM = 'SIGALRM',
+
+/* 15  */
+SIGTERM = 'SIGTERM',
+
+/* 16  */
+SIGSTKFLT = 'SIGSTKFLT',
+
+/* 17  */
+SIGCHLD = 'SIGCHLD',
+
+/* 18  */
+SIGCONT = 'SIGCONT',
+
+/* 19  */
+SIGSTOP = 'SIGSTOP',
+
+/* 20  */
+SIGTSTP = 'SIGTSTP',
+      // Ctrl-Z
+
+/* 21  */
+SIGTTIN = 'SIGTTIN',
+
+/* 22  */
+SIGTTOU = 'SIGTTOU',
+
+/* 23  */
+SIGURG = 'SIGURG',
+
+/* 24  */
+SIGXCPU = 'SIGXCPU',
+
+/* 25  */
+SIGXFSZ = 'SIGXFSZ',
+
+/* 26  */
+SIGVTALRM = 'SIGVTALRM',
+
+/* 27  */
+SIGPROF = 'SIGPROF',
+
+/* 28  */
+SIGWINCH = 'SIGWINCH',
+
+/* 29  */
+SIGIO = 'SIGIO',
+
+/* 30  */
+SIGPWR = 'SIGPWR',
+
+/* 31  */
+SIGSYS = 'SIGSYS';
+
+export { SIGABRT, SIGALRM, SIGBUS, SIGCHLD, SIGCONT, SIGFPE, SIGHUP, SIGILL, SIGINT, SIGIO, SIGKILL, SIGPIPE, SIGPROF, SIGPWR, SIGQUIT, SIGSEGV, SIGSTKFLT, SIGSTOP, SIGSYS, SIGTERM, SIGTRAP, SIGTSTP, SIGTTIN, SIGTTOU, SIGURG, SIGUSR1, SIGUSR2, SIGVTALRM, SIGWINCH, SIGXCPU, SIGXFSZ };
