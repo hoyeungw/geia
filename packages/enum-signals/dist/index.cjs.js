@@ -3,100 +3,100 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 const 
-/* 1   */
+/* 01 */
 SIGHUP = 'SIGHUP',
 
-/* 2   */
+/* 02 */
 SIGINT = 'SIGINT',
       // Ctrl-C
 
-/* 3   */
+/* 03 */
 SIGQUIT = 'SIGQUIT',
       // Ctrl-\
 
-/* 4   */
+/* 04 */
 SIGILL = 'SIGILL',
 
-/* 5   */
+/* 05 */
 SIGTRAP = 'SIGTRAP',
 
-/* 6   */
+/* 06 */
 SIGABRT = 'SIGABRT',
 
-/* 7   */
+/* 07 */
 SIGBUS = 'SIGBUS',
 
-/* 8   */
+/* 08 */
 SIGFPE = 'SIGFPE',
 
-/* 9   */
+/* 09 */
 SIGKILL = 'SIGKILL',
 
-/* 10  */
+/* 10 */
 SIGUSR1 = 'SIGUSR1',
 
-/* 11  */
+/* 11 */
 SIGSEGV = 'SIGSEGV',
 
-/* 12  */
+/* 12 */
 SIGUSR2 = 'SIGUSR2',
 
-/* 13  */
+/* 13 */
 SIGPIPE = 'SIGPIPE',
 
-/* 14  */
+/* 14 */
 SIGALRM = 'SIGALRM',
 
-/* 15  */
+/* 15 */
 SIGTERM = 'SIGTERM',
 
-/* 16  */
+/* 16 */
 SIGSTKFLT = 'SIGSTKFLT',
 
-/* 17  */
+/* 17 */
 SIGCHLD = 'SIGCHLD',
 
-/* 18  */
+/* 18 */
 SIGCONT = 'SIGCONT',
 
-/* 19  */
+/* 19 */
 SIGSTOP = 'SIGSTOP',
 
-/* 20  */
+/* 20 */
 SIGTSTP = 'SIGTSTP',
       // Ctrl-Z
 
-/* 21  */
+/* 21 */
 SIGTTIN = 'SIGTTIN',
 
-/* 22  */
+/* 22 */
 SIGTTOU = 'SIGTTOU',
 
-/* 23  */
+/* 23 */
 SIGURG = 'SIGURG',
 
-/* 24  */
+/* 24 */
 SIGXCPU = 'SIGXCPU',
 
-/* 25  */
+/* 25 */
 SIGXFSZ = 'SIGXFSZ',
 
-/* 26  */
+/* 26 */
 SIGVTALRM = 'SIGVTALRM',
 
-/* 27  */
+/* 27 */
 SIGPROF = 'SIGPROF',
 
-/* 28  */
+/* 28 */
 SIGWINCH = 'SIGWINCH',
 
-/* 29  */
+/* 29 */
 SIGIO = 'SIGIO',
 
-/* 30  */
+/* 30 */
 SIGPWR = 'SIGPWR',
 
-/* 31  */
+/* 31 */
 SIGSYS = 'SIGSYS';
 
 exports.SIGABRT = SIGABRT;
