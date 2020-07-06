@@ -1,14 +1,19 @@
 const MESSAGE = 'message',
       DONE = 'done',
-      ERROR = 'error',
-      EXIT = 'exit',
+      READY = 'ready',
       CONNECT = 'connect',
       CONNECTION = 'connection',
-      DISCONNECT = 'disconnect',
-      TASKED = 'tasked',
-      STATUS = 'status',
       FORK = 'fork',
       LISTENING = 'listening',
-      EXCEPTION = 'exception';
+      TASKED = 'tasked',
+      STATUS = 'status',
+      ONLINE = 'online';
+const CLOSE = 'close',
+      ERROR = 'error',
+      EXIT = 'exit',
+      EXCEPTION = 'exception',
+      DISCONNECT = 'disconnect',
+      UNCAUGHT_EXCEPTION = 'uncaughtException',
+      WARNING = 'warning';
 
-export { CONNECT, CONNECTION, DISCONNECT, DONE, ERROR, EXCEPTION, EXIT, FORK, LISTENING, MESSAGE, STATUS, TASKED };
+export { CLOSE, CONNECT, CONNECTION, DISCONNECT, DONE, ERROR, EXCEPTION, EXIT, FORK, LISTENING, MESSAGE, ONLINE, READY, STATUS, TASKED, UNCAUGHT_EXCEPTION, WARNING };

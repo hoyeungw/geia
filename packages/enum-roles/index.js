@@ -2,6 +2,8 @@ export const
   MASTER = 'master',
   AGENT = 'agent',
   WORKER = 'worker',
+  BROKER = 'broker',
+  LIAISON = 'liaison',
   APP = 'app',
   PARENT = 'parent',
   SERVER = 'server',
@@ -9,4 +11,5 @@ export const
   CLIENT = 'client',
   CHEF = 'chef',
   TOURNANT = 'tournant',
-  ABOYEUR = 'aboyeur'
+  ABOYEUR = 'aboyeur',
+  MESSENGER = 'messenger'

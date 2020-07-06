@@ -1,13 +1,20 @@
 export const
   MESSAGE = 'message',
   DONE = 'done',
-  ERROR = 'error',
-  EXIT = 'exit',
+  READY = 'ready',
   CONNECT = 'connect',
   CONNECTION = 'connection',
-  DISCONNECT = 'disconnect',
-  TASKED = 'tasked',
-  STATUS = 'status',
   FORK = 'fork',
   LISTENING = 'listening',
-  EXCEPTION = 'exception'
+  TASKED = 'tasked',
+  STATUS = 'status',
+  ONLINE = 'online'
+
+export const
+  CLOSE = 'close',
+  ERROR = 'error',
+  EXIT = 'exit',
+  EXCEPTION = 'exception',
+  DISCONNECT = 'disconnect',
+  UNCAUGHT_EXCEPTION = 'uncaughtException',
+  WARNING = 'warning'
