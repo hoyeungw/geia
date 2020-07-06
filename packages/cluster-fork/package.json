@@ -1,6 +1,6 @@
 {
   "name": "@geia/cluster-fork",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Fork cluster with configs",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -15,18 +15,18 @@
     "test": "node -r @babel/register test/test.index.js"
   },
   "dependencies": {
-    "@geia/enum-events": "^0.0.2",
-    "@geia/enum-roles": "^0.0.2",
-    "@palett/says": "^0.4.1",
-    "@spare/enum-loggers": "^0.8.0",
-    "@spare/logger": "^0.8.0",
-    "@typen/nullish": "^0.1.5",
-    "@valjoux/timestamp-pretty": "^0.1.10",
+    "@geia/enum-events": "^0.0.3",
+    "@geia/enum-roles": "^0.0.3",
     "@palett/cards": "^0.4.1",
     "@palett/dye": "^0.4.1",
     "@palett/enum-font-effects": "^0.4.1",
     "@palett/presets": "^0.4.1",
-    "@palett/projector": "^0.4.1"
+    "@palett/projector": "^0.4.1",
+    "@palett/says": "^0.4.1",
+    "@spare/enum-loggers": "^0.8.0",
+    "@spare/logger": "^0.8.0",
+    "@typen/nullish": "^0.1.5",
+    "@valjoux/timestamp-pretty": "^0.1.10"
   },
   "repository": {
     "type": "git",
