@@ -1,6 +1,6 @@
 {
   "name": "@geia/signaler",
-  "version": "0.0.0",
+  "version": "0.0.4",
   "description": "A cluster",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -16,9 +16,9 @@
     "test-jest": "jest"
   },
   "dependencies": {
-    "@geia/enum-events": "^0.0.3",
-    "@geia/enum-roles": "^0.0.3",
-    "@geia/enum-signals": "^0.0.3",
+    "@geia/enum-events": "^0.0.4",
+    "@geia/enum-roles": "^0.0.4",
+    "@geia/enum-signals": "^0.0.4",
     "@palett/says": "^0.4.2",
     "@spare/logger": "^0.8.0",
     "@valjoux/timestamp-pretty": "^0.1.10",
