@@ -1,13 +1,12 @@
 import { EXIT } from '@geia/enum-events';
 import { APP, AGENT } from '@geia/enum-roles';
 import { SIGTERM, SIGKILL, SIGINT, SIGQUIT } from '@geia/enum-signals';
-import { ros, says } from '@palett/says';
-import { logger } from '@spare/logger';
+import { says, ros } from '@palett/says';
 import { dateTime } from '@valjoux/timestamp-pretty';
 import cluster from 'cluster';
 import co from 'co';
+import descendantPids from '@geia/descendant-pids';
 import awaitEvent from 'await-event';
-import pstree from 'ps-tree';
 
 function createCommonjsModule(fn, basedir, module) {
 	return module = {
@@ -224,7 +223,7 @@ const terminate = function* (subProcess, timeout) {
   const {
     pid
   } = (_subProcess$process = subProcess.process) !== null && _subProcess$process !== void 0 ? _subProcess$process : subProcess;
-  const childPids = yield getChildPids(pid);
+  const childPids = yield descendantPids(pid);
   yield [killProcess(subProcess, timeout), killChildren(childPids, timeout)];
 }; // kill process, if SIGTERM not work, try SIGKILL
 
@@ -256,16 +255,6 @@ function* killChildren(children, timeout) {
   kill(unterminated, SIGKILL);
 }
 
-function getChildPids(pid) {
-  return new Promise(resolve => {
-    pstree(pid, (err, children) => {
-      // if get children error, just ignore it
-      if (err) children = [];
-      resolve(children.map(children => parseInt(children.PID)));
-    });
-  });
-}
-
 function kill(pids, signal) {
   for (const pid of pids) {
     try {
@@ -289,15 +278,18 @@ function getUnterminatedProcesses(pids) {
 
 const SIGNALER = 'signaler';
 const TIMEOUT = 1800;
+const logger = says[SIGNALER].attach(dateTime);
 class Signaler {
   /**
    * SIGINT kill(2) Ctrl-C
    * SIGQUIT kill(3) Ctrl-\
    * SIGTERM kill(15) default
    *
-   * @param {*} instance
-   * @param {EventEmitter} subProcess
-   * @param {*[]} [signals]
+   * @param {Object|EventEmitter} instance
+   * @param {Object|EventEmitter} instance.agent
+   * @param {boolean} instance.closed
+   * @param {NodeJS.Process} subProcess
+   * @param {string[]} [signals]
    */
   static register(instance, subProcess, signals = [SIGINT, SIGQUIT, SIGTERM]) {
     for (let signal of signals) {
@@ -312,7 +304,7 @@ function processOnSignal(signal) {
   var _ref;
 
   if (this.closed) return;
-  _ref = `receive signal ${ros(signal)}, closing`, says[SIGNALER].p(dateTime())(_ref);
+  _ref = `receive signal ${ros(signal)}, closing`, logger(_ref);
   this.closed = true;
   const context = this;
   co(function* () {
@@ -321,12 +313,12 @@ function processOnSignal(signal) {
 
       yield genCloseWorkers(cluster.workers);
       yield genCloseAgent(context.agent);
-      _ref2 = `close done, exiting with code: ${ros('0')}`, says[SIGNALER].p(dateTime())(_ref2);
+      _ref2 = `close done, exiting with code: ${ros('0')}`, logger(_ref2);
       process.exit(0);
     } catch (e) {
       var _ref3;
 
-      _ref3 = `close with error: ${e}`, says[SIGNALER].p(dateTime())(_ref3);
+      _ref3 = `close with error: ${e}`, logger(_ref3);
       process.exit(1);
     }
   });
@@ -334,36 +326,36 @@ function processOnSignal(signal) {
 function processOnExit(code) {
   var _ref4;
 
-  _ref4 = `exit with code: ${ros(String(code))}`, says[SIGNALER].p(dateTime())(_ref4);
+  _ref4 = `exit with code: ${ros(String(code))}`, logger(_ref4);
 }
 function* genCloseWorkers(workers) {
   var _ref5, _ref6;
 
   const timeout = process.env.LEA_APP_CLOSE_TIMEOUT || process.env.LEA_MASTER_CLOSE_TIMEOUT || TIMEOUT;
-  _ref5 = `send kill ${ros(SIGTERM)} to ${ros(APP)} workers, will exit with code ${ros('0')} after ${timeout}ms`, says[SIGNALER].p(dateTime())(_ref5);
-  _ref6 = `wait ${timeout}ms`, says[SIGNALER].p(dateTime())(_ref6);
+  _ref5 = `send kill ${ros(SIGTERM)} to ${ros(APP)} workers, will exit with code ${ros('0')} after ${timeout}ms`, logger(_ref5);
+  _ref6 = `wait ${timeout}ms`, logger(_ref6);
 
   try {
     yield killAppWorkers(workers, timeout);
   } catch (e) {
     var _ref7;
 
-    _ref7 = `${ros(APP)} workers exit error: ${e}`, says[SIGNALER].p(dateTime())(_ref7);
+    _ref7 = `${ros(APP)} workers exit error: ${e}`, logger(_ref7);
   }
 }
 function* genCloseAgent(agent) {
   var _ref8, _ref9;
 
   const timeout = process.env.LEA_AGENT_CLOSE_TIMEOUT || process.env.LEA_MASTER_CLOSE_TIMEOUT || TIMEOUT;
-  _ref8 = `send kill ${ros(SIGTERM)} to ${ros(AGENT)} worker, will exit with code ${ros('0')} after ${timeout}ms`, says[SIGNALER].p(dateTime())(_ref8);
-  _ref9 = `wait ${timeout}ms`, says[SIGNALER].p(dateTime())(_ref9);
+  _ref8 = `send kill ${ros(SIGTERM)} to ${ros(AGENT)} worker, will exit with code ${ros('0')} after ${timeout}ms`, logger(_ref8);
+  _ref9 = `wait ${timeout}ms`, logger(_ref9);
 
   try {
     yield killAgentWorker(agent, timeout);
   } catch (e) {
     var _ref10;
 
-    _ref10 = `${ros(AGENT)} worker exit error: ${e}`, says[SIGNALER].p(dateTime())(_ref10);
+    _ref10 = `${ros(AGENT)} worker exit error: ${e}`, logger(_ref10);
   }
 }
 

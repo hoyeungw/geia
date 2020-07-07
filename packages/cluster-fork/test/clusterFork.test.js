@@ -1,49 +1,35 @@
 import { DISCONNECT, EXIT, FORK, LISTENING } from '@geia/enum-events'
+import { Signaler }                          from '@geia/signaler'
 import { says }                              from '@palett/says'
 import { deco }                              from '@spare/deco'
 import { decoString }                        from '@spare/logger'
 import { dateTime }                          from '@valjoux/timestamp-pretty'
 import cluster                               from 'cluster'
-import { ClusterFork }                       from '../src/classic/ClusterFork'
+import { ClusterFork }                       from '../src/ClusterFork'
 import { byMaster, byWorker }                from '../utils/writes'
 
-
 const test = async () => {
-  const MASTER = byMaster(process)
-  decoString('================================ clusterFork.test ================================') |> says[MASTER].p(dateTime())
-  ClusterFork.build({
-    exec: 'packages/cluster-fork/test/worker.js',
-    count: 2,
-  })
-  cluster
+  const logger = says[byMaster(process)].attach(dateTime)
+  decoString('================================ clusterFork.test ================================') |> logger
+  ClusterFork
+    .build({
+      exec: 'packages/cluster-fork/test/worker.js',
+      count: 2,
+    })
     .on(FORK, worker => {
       worker.disableRefork = true;
-      `[${ worker.process.env?.NODE_UNIQUE_ID }] new worker start` |> says[byWorker(worker.process)].p(dateTime())
-      // worker |> delogger
+      `[ ${ byWorker(worker) } ] new worker start` |> says[byWorker(worker)].p(dateTime())
     })
     .on(LISTENING, worker => {
-      `[${ worker.process.env?.NODE_UNIQUE_ID }] new worker listening` |> says[byWorker(worker.process)].p(dateTime())
-      const info = {
-        id: worker.id,
-        pid: worker.process.pid
-      }
-      worker.send('Hello worker:' + deco(info))
+      `[${ byWorker(worker) } ] new worker listening` |> says[byWorker(worker)].p(dateTime())
+      worker.send('Hello worker:' + deco({ id: worker.id, pid: worker.process.pid }))
     })
-    .on(DISCONNECT, worker => {
-      `on [${ DISCONNECT }] disconnected` |> says[MASTER].p(dateTime())
-      // console.warn('[%s] [master:%s] wroker:%s disconnect, exitedAfterDisconnect: %s, state: %s.',
-      //   Date(), process.pid, worker.process.pid, worker.exitedAfterDisconnect, worker.state)
-    })
+    .on(DISCONNECT, worker => {`[${ byWorker(worker) }] on [${ DISCONNECT }] disconnected` |> logger })
     .on(EXIT, (worker, code, signal) => {
-      const info = { code, signal, exitCode: worker.process.exitCode };
-      `on [${ EXIT }] exited with ${ deco(info) }` |> says[MASTER].p(dateTime())
-      // const exitCode = worker.process.exitCode
-      // const err = new Error(util.format('worker %s died (code: %s, signal: %s, exitedAfterDisconnect: %s, state: %s)',
-      //   worker.process.pid, exitCode, signal, worker.exitedAfterDisconnect, worker.state))
-      // err.name = 'WorkerDiedError'
-      // console.error('[%s] [master:%s] wroker exit: %s', Date(), process.pid, err.stack)
+      `[${ byWorker(worker) }] on [${ EXIT }] exited with ${ deco(
+        { code, signal, exitCode: worker.process.exitCode }) }` |> logger
     })
-
+  Signaler.register({ agent: {}, closed: false }, process)
   setImmediate(() => {
     for (let id in cluster.workers) {
       const worker = cluster.workers[id]

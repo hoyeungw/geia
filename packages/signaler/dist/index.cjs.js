@@ -8,12 +8,11 @@ var enumEvents = require('@geia/enum-events');
 var enumRoles = require('@geia/enum-roles');
 var enumSignals = require('@geia/enum-signals');
 var says = require('@palett/says');
-var logger = require('@spare/logger');
 var timestampPretty = require('@valjoux/timestamp-pretty');
 var cluster = _interopDefault(require('cluster'));
 var co = _interopDefault(require('co'));
+var descendantPids = _interopDefault(require('@geia/descendant-pids'));
 var awaitEvent = _interopDefault(require('await-event'));
-var pstree = _interopDefault(require('ps-tree'));
 
 function createCommonjsModule(fn, basedir, module) {
 	return module = {
@@ -230,7 +229,7 @@ const terminate = function* (subProcess, timeout) {
   const {
     pid
   } = (_subProcess$process = subProcess.process) !== null && _subProcess$process !== void 0 ? _subProcess$process : subProcess;
-  const childPids = yield getChildPids(pid);
+  const childPids = yield descendantPids(pid);
   yield [killProcess(subProcess, timeout), killChildren(childPids, timeout)];
 }; // kill process, if SIGTERM not work, try SIGKILL
 
@@ -262,16 +261,6 @@ function* killChildren(children, timeout) {
   kill(unterminated, enumSignals.SIGKILL);
 }
 
-function getChildPids(pid) {
-  return new Promise(resolve => {
-    pstree(pid, (err, children) => {
-      // if get children error, just ignore it
-      if (err) children = [];
-      resolve(children.map(children => parseInt(children.PID)));
-    });
-  });
-}
-
 function kill(pids, signal) {
   for (const pid of pids) {
     try {
@@ -295,15 +284,18 @@ function getUnterminatedProcesses(pids) {
 
 const SIGNALER = 'signaler';
 const TIMEOUT = 1800;
+const logger = says.says[SIGNALER].attach(timestampPretty.dateTime);
 class Signaler {
   /**
    * SIGINT kill(2) Ctrl-C
    * SIGQUIT kill(3) Ctrl-\
    * SIGTERM kill(15) default
    *
-   * @param {*} instance
-   * @param {EventEmitter} subProcess
-   * @param {*[]} [signals]
+   * @param {Object|EventEmitter} instance
+   * @param {Object|EventEmitter} instance.agent
+   * @param {boolean} instance.closed
+   * @param {NodeJS.Process} subProcess
+   * @param {string[]} [signals]
    */
   static register(instance, subProcess, signals = [enumSignals.SIGINT, enumSignals.SIGQUIT, enumSignals.SIGTERM]) {
     for (let signal of signals) {
@@ -318,7 +310,7 @@ function processOnSignal(signal) {
   var _ref;
 
   if (this.closed) return;
-  _ref = `receive signal ${says.ros(signal)}, closing`, says.says[SIGNALER].p(timestampPretty.dateTime())(_ref);
+  _ref = `receive signal ${says.ros(signal)}, closing`, logger(_ref);
   this.closed = true;
   const context = this;
   co(function* () {
@@ -327,12 +319,12 @@ function processOnSignal(signal) {
 
       yield genCloseWorkers(cluster.workers);
       yield genCloseAgent(context.agent);
-      _ref2 = `close done, exiting with code: ${says.ros('0')}`, says.says[SIGNALER].p(timestampPretty.dateTime())(_ref2);
+      _ref2 = `close done, exiting with code: ${says.ros('0')}`, logger(_ref2);
       process.exit(0);
     } catch (e) {
       var _ref3;
 
-      _ref3 = `close with error: ${e}`, says.says[SIGNALER].p(timestampPretty.dateTime())(_ref3);
+      _ref3 = `close with error: ${e}`, logger(_ref3);
       process.exit(1);
     }
   });
@@ -340,36 +332,36 @@ function processOnSignal(signal) {
 function processOnExit(code) {
   var _ref4;
 
-  _ref4 = `exit with code: ${says.ros(String(code))}`, says.says[SIGNALER].p(timestampPretty.dateTime())(_ref4);
+  _ref4 = `exit with code: ${says.ros(String(code))}`, logger(_ref4);
 }
 function* genCloseWorkers(workers) {
   var _ref5, _ref6;
 
   const timeout = process.env.LEA_APP_CLOSE_TIMEOUT || process.env.LEA_MASTER_CLOSE_TIMEOUT || TIMEOUT;
-  _ref5 = `send kill ${says.ros(enumSignals.SIGTERM)} to ${says.ros(enumRoles.APP)} workers, will exit with code ${says.ros('0')} after ${timeout}ms`, says.says[SIGNALER].p(timestampPretty.dateTime())(_ref5);
-  _ref6 = `wait ${timeout}ms`, says.says[SIGNALER].p(timestampPretty.dateTime())(_ref6);
+  _ref5 = `send kill ${says.ros(enumSignals.SIGTERM)} to ${says.ros(enumRoles.APP)} workers, will exit with code ${says.ros('0')} after ${timeout}ms`, logger(_ref5);
+  _ref6 = `wait ${timeout}ms`, logger(_ref6);
 
   try {
     yield killAppWorkers(workers, timeout);
   } catch (e) {
     var _ref7;
 
-    _ref7 = `${says.ros(enumRoles.APP)} workers exit error: ${e}`, says.says[SIGNALER].p(timestampPretty.dateTime())(_ref7);
+    _ref7 = `${says.ros(enumRoles.APP)} workers exit error: ${e}`, logger(_ref7);
   }
 }
 function* genCloseAgent(agent) {
   var _ref8, _ref9;
 
   const timeout = process.env.LEA_AGENT_CLOSE_TIMEOUT || process.env.LEA_MASTER_CLOSE_TIMEOUT || TIMEOUT;
-  _ref8 = `send kill ${says.ros(enumSignals.SIGTERM)} to ${says.ros(enumRoles.AGENT)} worker, will exit with code ${says.ros('0')} after ${timeout}ms`, says.says[SIGNALER].p(timestampPretty.dateTime())(_ref8);
-  _ref9 = `wait ${timeout}ms`, says.says[SIGNALER].p(timestampPretty.dateTime())(_ref9);
+  _ref8 = `send kill ${says.ros(enumSignals.SIGTERM)} to ${says.ros(enumRoles.AGENT)} worker, will exit with code ${says.ros('0')} after ${timeout}ms`, logger(_ref8);
+  _ref9 = `wait ${timeout}ms`, logger(_ref9);
 
   try {
     yield killAgentWorker(agent, timeout);
   } catch (e) {
     var _ref10;
 
-    _ref10 = `${says.ros(enumRoles.AGENT)} worker exit error: ${e}`, says.says[SIGNALER].p(timestampPretty.dateTime())(_ref10);
+    _ref10 = `${says.ros(enumRoles.AGENT)} worker exit error: ${e}`, logger(_ref10);
   }
 }
 
@@ -398,7 +390,7 @@ const killAgentWorker = function (agent, timeout) {
   if (agent) {
     var _ref11;
 
-    _ref11 = `kill ${says.ros(enumRoles.AGENT)} worker with signal ${says.ros(enumSignals.SIGTERM)}`, logger.logger(_ref11);
+    _ref11 = `kill ${says.ros(enumRoles.AGENT)} worker with signal ${says.ros(enumSignals.SIGTERM)}`, logger(_ref11);
     agent.removeAllListeners();
   }
 

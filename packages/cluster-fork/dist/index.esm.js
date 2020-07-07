@@ -106,8 +106,30 @@ function forkWorker({
 
 const defer = global.setImmediate || process.nextTick;
 const CLUSTER_SETTINGS$1 = Symbol.for('clusterSettings');
+/**
+ * @typedef {Object}   ForkConfig
+ * @typedef {string}   [ForkConfig.exec]     file path to worker file
+ * @typedef {number}   [ForkConfig.count]    worker num, default is `os.cpus().length - 1`
+ * @typedef {string[]} [ForkConfig.args]     string arguments passed to worker
+ * @typedef {Object}   [ForkConfig.env]      key/value pairs to add to worker process environment
+ * @typedef {string[]} [ForkConfig.execArgv] list of string arguments passed to the Node.js executable.
+ * @typedef {boolean}  [ForkConfig.silent]   whether or not to send output to parent's stdio, default is `false`
+ * @typedef {boolean}  [ForkConfig.refork]   refork when disconnect and unexpected exit, default is `true`
+ * @typedef {boolean}  [ForkConfig.autoCoverage] auto fork with istanbul when `running_under_istanbul` env set, default is `false`
+ * @typedef {boolean}  [ForkConfig.windowsHide]  hide the forked processes console window that would normally be created on Windows systems. Default: false.
+ * @typedef {Array}    [ForkConfig.slaves]   slave processes
+ * @typedef {number}   [ForkConfig.limit]
+ * @typedef {number}   [ForkConfig.duration]
+ */
+
+/**
+ *
+ */
+
 class ClusterFork {
   /** @type {string} */
+
+  /** @type {*} */
 
   /** @type {number} */
 
@@ -129,27 +151,15 @@ class ClusterFork {
   // 1 min
 
   /**
-   * cluster fork
-   *
-   * @param {Object} [p]
-   * @param {String} [p.exec]     exec file path
-   * @param {Array} [p.args]      exec arguments
-   * @param {Array} [p.slaves]    slave processes
-   * @param {Boolean} [p.silent]  whether or not to send output to parent's stdio, default is `false`
-   * @param {Number} [p.count]    worker num, default is `os.cpus().length - 1`
-   * @param {Boolean} [p.refork]  refork when disconnect and unexpected exit, default is `true`
-   * @param {Boolean} [p.autoCoverage] auto fork with istanbul when `running_under_istanbul` env set, default is `false`
-   * @param {Boolean} [p.windowsHide] Hide the forked processes console window that would normally be created on Windows systems. Default: false.
-   * @param {number} [p.limit]
-   * @param {number} [p.duration]
-   * @param {Object} [p.env]
-   * @param {*} [p.execArgv]
+   * @param {ForkConfig} [p]
    * @return {Cluster}
    */
   constructor(p = {}) {
     var _p$refork;
 
     _defineProperty(this, "name", byMaster(process));
+
+    _defineProperty(this, "logger", says[this.name].attach(dateTime));
 
     _defineProperty(this, "count", void 0);
 
@@ -224,25 +234,25 @@ class ClusterFork {
     cluster.on(DISCONNECT, worker => {
       var _ref;
 
-      const saysMaster = says[this.name].level(worker[DISABLE_REFORK] ? INFO : ERROR);
+      const logger = this.logger.level(worker[DISABLE_REFORK] ? INFO : ERROR);
       const WORKER = byWorker(worker);
       this.disconnectCount++;
       _ref = `${WORKER} disconnects (${decoFlat(this.exceptionInfo({
         worker
-      }))})`, saysMaster.p(dateTime())(_ref);
+      }))})`, logger(_ref);
 
       if (worker === null || worker === void 0 ? void 0 : worker.isDead()) {
         var _ref2;
 
         // worker has terminated before disconnect
-        return void (_ref2 = `not forking, because ${WORKER} exit event emits before disconnect`, saysMaster.p(dateTime())(_ref2));
+        return void (_ref2 = `not forking, because ${WORKER} exit event emits before disconnect`, logger.p(dateTime())(_ref2));
       }
 
       if (worker[DISABLE_REFORK]) {
         var _ref3;
 
         // worker has terminated by master, like egg-cluster master will set disableRefork to true
-        return void (_ref3 = `not forking, because ${WORKER} will be killed soon`, saysMaster.p(dateTime())(_ref3));
+        return void (_ref3 = `not forking, because ${WORKER} will be killed soon`, logger.p(dateTime())(_ref3));
       }
 
       this.disconnects[worker.process.pid] = dateTime();
@@ -250,7 +260,7 @@ class ClusterFork {
       if (!this.allowRefork) {
         var _ref4;
 
-        _ref4 = `not forking new worker (refork: ${this.refork})`, saysMaster.p(dateTime())(_ref4);
+        _ref4 = `not forking new worker (refork: ${this.refork})`, logger(_ref4);
       } else {
         var _ref5;
 
@@ -259,13 +269,13 @@ class ClusterFork {
           env: this.attachedEnv,
           clusterSettings: worker[CLUSTER_SETTINGS$1]
         });
-        _ref5 = `${dateTime()} new ${byWorker(newWorker.process)} fork (state: ${newWorker.state})`, saysMaster(_ref5);
+        _ref5 = `${dateTime()} new ${byWorker(newWorker.process)} fork (state: ${newWorker.state})`, logger(_ref5);
       }
     });
     cluster.on(EXIT, (worker, code, signal) => {
       var _ref6;
 
-      const saysMaster = says[this.name].level(worker[DISABLE_REFORK] ? INFO : ERROR);
+      const logger = this.logger.level(worker[DISABLE_REFORK] ? INFO : ERROR);
       const WORKER = byWorker(worker);
       const isExpected = !!this.disconnects[worker.process.pid];
       const info = this.exceptionInfo({
@@ -273,7 +283,7 @@ class ClusterFork {
         code,
         signal
       });
-      _ref6 = `${WORKER} exit (${decoFlat(info)}) isExpected (${isExpected})`, saysMaster.p(dateTime())(_ref6);
+      _ref6 = `${WORKER} exit (${decoFlat(info)}) isExpected (${isExpected})`, logger(_ref6);
 
       if (isExpected) {
         return void delete this.disconnects[worker.process.pid];
@@ -290,7 +300,7 @@ class ClusterFork {
       if (!this.allowRefork) {
         var _ref7;
 
-        _ref7 = `not forking new worker (refork: ${this.refork})`, saysMaster.p(dateTime())(_ref7);
+        _ref7 = `not forking new worker (refork: ${this.refork})`, logger(_ref7);
       } else {
         var _ref8;
 
@@ -299,7 +309,7 @@ class ClusterFork {
           env: this.attachedEnv,
           clusterSettings: worker[CLUSTER_SETTINGS$1]
         });
-        _ref8 = `new ${byWorker(newWorker.process)} fork (state: ${newWorker.state})`, saysMaster.p(dateTime())(_ref8);
+        _ref8 = `new ${byWorker(newWorker.process)} fork (state: ${newWorker.state})`, logger(_ref8);
       }
 
       cluster.emit(UNEXPECTED_EXIT, worker, code, signal);
@@ -344,8 +354,7 @@ class ClusterFork {
     return cluster;
   }
   /**
-   *
-   * @param p
+   * @param {ForkConfig} p
    * @return {Cluster}
    */
 
@@ -357,18 +366,22 @@ class ClusterFork {
 
 
   get allowRefork() {
-    if (!this.refork) {
+    const {
+      reforks
+    } = this;
+
+    if (!refork) {
       return false;
     }
 
-    const times = this.reforks.push(Date.now());
+    const times = reforks.push(Date.now());
 
     if (times > this.limit) {
-      this.reforks.shift();
+      reforks.shift();
     }
 
-    const span = this.reforks[this.reforks.length - 1] - this.reforks[0];
-    const canFork = this.reforks.length < this.limit || span > this.duration;
+    const span = reforks[reforks.length - 1] - reforks[0];
+    const canFork = reforks.length < this.limit || span > this.duration;
 
     if (!canFork) {
       cluster.emit(REACH_REFORK_LIMIT);
@@ -385,9 +398,9 @@ class ClusterFork {
       return;
     }
 
-    _ref9 = `master uncaughtException: ${err.stack}`, says[this.name].p(dateTime()).level(ERROR)(_ref9);
-    _ref10 = `[error] ${err}`, says[this.name].p(dateTime())(_ref10);
-    _ref11 = `(total ${this.disconnectCount} disconnect, ${this.unexpectedCount} unexpected exit)`, says[this.name].p(dateTime())(_ref11);
+    _ref9 = `master uncaughtException: ${err.stack}`, this.logger.level(ERROR)(_ref9);
+    _ref10 = `[error] ${err}`, this.logger(_ref10);
+    _ref11 = `(total ${this.disconnectCount} disconnect, ${this.unexpectedCount} unexpected exit)`, this.logger(_ref11);
   }
 
   onUnexpectedExit(worker, code, signal) {
@@ -398,14 +411,14 @@ class ClusterFork {
     const exitKey = (_worker = worker, workerExitKey(_worker));
     const err = new Error(`${byWorker(worker)} died unexpectedly (code: ${exitCode}, signal: ${signal}, ${exitKey}: ${worker[exitKey]}, state: ${worker.state})`);
     err.name = 'WorkerDiedUnexpectedError';
-    _ref12 = `(total ${this.disconnectCount} disconnect, ${this.unexpectedCount} unexpected exit) ${err.stack}`, says[this.name].p(dateTime()).level(ERROR)(_ref12);
+    _ref12 = `(total ${this.disconnectCount} disconnect, ${this.unexpectedCount} unexpected exit) ${err.stack}`, this.logger.level(ERROR)(_ref12);
   }
 
   onReachReforkLimit() {
     var _ref13;
 
     // reachReforkLimit default handler
-    _ref13 = `worker died too fast (total ${this.disconnectCount} disconnect, ${this.unexpectedCount} unexpected exit)`, says[this.name].p(dateTime()).level(ERROR)(_ref13);
+    _ref13 = `worker died too fast (total ${this.disconnectCount} disconnect, ${this.unexpectedCount} unexpected exit)`, this.logger.level(ERROR)(_ref13);
   }
 
   exceptionInfo({

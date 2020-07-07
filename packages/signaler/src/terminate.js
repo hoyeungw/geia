@@ -1,12 +1,12 @@
+import descendantPids       from '@geia/descendant-pids'
 import { EXIT }             from '@geia/enum-events'
 import { SIGKILL, SIGTERM } from '@geia/enum-signals'
 import awaitEvent           from 'await-event'
 import sleep                from 'mz-modules/sleep'
-import pstree               from 'ps-tree'
 
 export const terminate = function* (subProcess, timeout) {
   const { pid } = (subProcess.process ?? subProcess)
-  const childPids = yield getChildPids(pid)
+  const childPids = yield descendantPids(pid)
   yield [
     killProcess(subProcess, timeout),
     killChildren(childPids, timeout),
@@ -40,16 +40,6 @@ function* killChildren(children, timeout) {
     if (!unterminated.length) return
   }
   kill(unterminated, SIGKILL)
-}
-
-function getChildPids(pid) {
-  return new Promise(resolve => {
-    pstree(pid, (err, children) => {
-      // if get children error, just ignore it
-      if (err) children = []
-      resolve(children.map(children => parseInt(children.PID)))
-    })
-  })
 }
 
 function kill(pids, signal) {

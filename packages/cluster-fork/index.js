@@ -1,4 +1,4 @@
-export { ClusterFork } from './src/classic/ClusterFork'
+export { ClusterFork } from './src/ClusterFork'
 
 // /**
 //  * cluster fork
