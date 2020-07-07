@@ -28,7 +28,7 @@ const babelPluginOptions = {
 export default [
   {
     input: 'index.js',
-    external: Object.keys(dependencies || {}),
+    external: ['os', 'cluster', ...Object.keys(dependencies || {})],
     output: [
       { file: main, format: 'cjs' },  // CommonJS (for Node) build.
       { file: module, format: 'esm' }  // ES module (for bundlers) build.

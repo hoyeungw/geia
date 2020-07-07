@@ -1,7 +1,7 @@
 {
-  "name": "@geia/cluster-fork",
+  "name": "@geia/by",
   "version": "0.0.3",
-  "description": "Fork cluster with configs",
+  "description": "User-friendly pretty cluster role names to go through clearer log",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "files": [

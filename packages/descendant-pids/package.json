@@ -1,0 +1,41 @@
+{
+  "name": "@geia/descendant-pids",
+  "version": "0.0.0",
+  "description": "Get descendant pids of a process",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "pub": "npm publish",
+    "test": "node -r @babel/register test/test.index.js"
+  },
+  "dependencies": {
+    "ps-tree": "^1.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoyeungw/mcore/cluster.git"
+  },
+  "keywords": [
+    "geia",
+    "process",
+    "ps-tree",
+    "child-pids",
+    "descendant-pids"
+  ],
+  "author": {
+    "name": "Hoyeung Wong",
+    "email": "hoyeungw@outlook.com",
+    "url": "https://github.com/hoyeungw"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hoyeungw/mcore/cluster"
+  },
+  "homepage": "https://github.com/hoyeungw/mcore/cluster#readme"
+}

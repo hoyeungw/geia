@@ -1,0 +1,50 @@
+{
+  "name": "@geia/signaler",
+  "version": "0.0.0",
+  "description": "A cluster",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "pub": "npm publish",
+    "test": "node -r @babel/register test/test.index.js",
+    "test-jest": "jest"
+  },
+  "dependencies": {
+    "@geia/enum-events": "^0.0.3",
+    "@geia/enum-roles": "^0.0.3",
+    "@geia/enum-signals": "^0.0.3",
+    "@palett/says": "^0.4.2",
+    "@spare/logger": "^0.8.0",
+    "@valjoux/timestamp-pretty": "^0.1.10",
+    "await-event": "^2.1.0",
+    "co": "^4.6.0",
+    "mz-modules": "^2.1.0",
+    "ps-tree": "^1.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoyeungw/mcore/cluster.git"
+  },
+  "keywords": [
+    "geia",
+    "process",
+    "signal-handler",
+    "signaler"
+  ],
+  "author": {
+    "name": "Hoyeung Wong",
+    "email": "hoyeungw@outlook.com",
+    "url": "https://github.com/hoyeungw"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hoyeungw/mcore/cluster"
+  },
+  "homepage": "https://github.com/hoyeungw/mcore/cluster#readme"
+}
