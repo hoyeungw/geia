@@ -1,1 +1,1 @@
-export { by } from './src/by'
+export { by, byWorker, byMaster, byAgent } from './src/by'

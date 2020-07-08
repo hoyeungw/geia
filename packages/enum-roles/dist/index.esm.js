@@ -1,16 +1,23 @@
 const MASTER = 'master',
+      MAIN = 'main',
       AGENT = 'agent',
       WORKER = 'worker',
       BROKER = 'broker',
       LIAISON = 'liaison',
-      APP = 'app',
-      PARENT = 'parent',
+      SIGNALER = 'signaler',
+      INSTITUTE = 'institute',
+      DISPATCHER = 'dispatcher';
+const APP = 'app',
       SERVER = 'server',
       VENDOR = 'vendor',
       CLIENT = 'client',
-      CHEF = 'chef',
-      TOURNANT = 'tournant',
-      ABOYEUR = 'aboyeur',
       MESSENGER = 'messenger';
+const PARENT = 'parent',
+      DESCENDANT = 'descendant',
+      CHILD = 'child',
+      CHILDREN = 'children';
+const CHEF = 'chef',
+      TOURNANT = 'tournant',
+      ABOYEUR = 'aboyeur';
 
-export { ABOYEUR, AGENT, APP, BROKER, CHEF, CLIENT, LIAISON, MASTER, MESSENGER, PARENT, SERVER, TOURNANT, VENDOR, WORKER };
+export { ABOYEUR, AGENT, APP, BROKER, CHEF, CHILD, CHILDREN, CLIENT, DESCENDANT, DISPATCHER, INSTITUTE, LIAISON, MAIN, MASTER, MESSENGER, PARENT, SERVER, SIGNALER, TOURNANT, VENDOR, WORKER };

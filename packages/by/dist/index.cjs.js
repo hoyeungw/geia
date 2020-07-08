@@ -6,38 +6,95 @@ var enumRoles = require('@geia/enum-roles');
 var cards = require('@palett/cards');
 var dye = require('@palett/dye');
 var says = require('@palett/says');
+var enumDataTypes = require('@typen/enum-data-types');
+var nullish = require('@typen/nullish');
 var enumFontEffects = require('@palett/enum-font-effects');
 var presets = require('@palett/presets');
 var projector = require('@palett/projector');
 
-const pigFore = projector.Pigment({
+const pigShade = projector.Pigment({
   min: 0,
   max: 99
 }, presets.SUBTLE);
-const pigMid = projector.Pigment({
+const pigE0 = projector.Pigment({
   min: 0,
   max: 9
 }, presets.INSTA, [enumFontEffects.BOLD]);
-const pigEnd = projector.Pigment({
+const pigE1 = projector.Pigment({
   min: 0,
   max: 99
 }, presets.INSTA, [enumFontEffects.BOLD]);
+const dyeThreadId = threadId => {
+  const text = String(threadId).padStart(2, '0');
+
+  if (text.length === 2) {
+    const fore = text.slice(-2, -1),
+          after = text.slice(-1);
+    return (fore === '0' ? pigShade(fore) : pigE0(fore)) + pigE0(after);
+  }
+
+  return dyePid(threadId);
+};
 const dyePid = pid => {
   const text = String(pid).padStart(5, '0');
   const fore = text.slice(0, -3),
         mid = text.slice(-3, -2),
         after = text.slice(-2);
-  return pigFore(fore) + pigMid(mid) + pigEnd(after);
+  return pigShade(fore) + pigE0(mid) + pigE1(after);
 };
 
-const Dyes = {};
-Dyes[enumRoles.AGENT] = dye.HexDye(cards.Palett.green.accent_2);
-Dyes[enumRoles.MASTER] = dye.HexDye(cards.Palett.amber.base);
-Dyes[enumRoles.WORKER] = dye.HexDye(cards.Palett.grey.accent_2);
-const by = (sub, name) => {
-  var _sub$process2;
+// import threads from 'worker_threads'
 
-  return (name ? name in Dyes ? Dyes[name](name) : says.ros(name) : 'process') + ':' + dyePid(((_sub$process2 = sub === null || sub === void 0 ? void 0 : sub.process) !== null && _sub$process2 !== void 0 ? _sub$process2 : sub).pid);
+const Dyes = {};
+Dyes[enumRoles.WORKER] = dye.HexDye(cards.Palett.grey.accent_2);
+Dyes[enumRoles.MASTER] = dye.HexDye(cards.Palett.amber.base);
+Dyes[enumRoles.AGENT] = dye.HexDye(cards.Palett.green.accent_2);
+Dyes[enumRoles.MAIN] = dye.HexDye(cards.Palett.orange.base);
+const byAgent = (sub, name) => Dyes[enumRoles.AGENT](name !== null && name !== void 0 ? name : enumRoles.AGENT) + ':' + dyePid(sub.pid);
+const byMaster = (sub, name) => Dyes[enumRoles.MASTER](name !== null && name !== void 0 ? name : enumRoles.MASTER) + ':' + dyePid(sub.pid);
+const byWorker = (sub, name) => {
+  var _sub$process;
+
+  return Dyes[enumRoles.WORKER](name !== null && name !== void 0 ? name : enumRoles.WORKER) + ':' + dyePid(((_sub$process = sub === null || sub === void 0 ? void 0 : sub.process) !== null && _sub$process !== void 0 ? _sub$process : sub).pid);
+};
+const by = (sub, name) => {
+  var _name;
+
+  if (nullish.nullish(name)) {
+    var _sub$constructor;
+
+    name = typeof sub === enumDataTypes.OBJ ? sub === null || sub === void 0 ? void 0 : (_sub$constructor = sub.constructor) === null || _sub$constructor === void 0 ? void 0 : _sub$constructor.name : '_';
+  }
+
+  const prefix = name in Dyes ? (_name = name, Dyes[name](_name)) : says.ros(name);
+
+  function suffix(sub) {
+    let id;
+
+    if (typeof sub === enumDataTypes.NUM) {
+      if (sub < 100) {
+        return dyeThreadId(~~sub);
+      }
+
+      if (sub < 100000) {
+        return dyePid(~~sub);
+      }
+    }
+
+    if (typeof sub === enumDataTypes.OBJ) {
+      var _sub$process2;
+
+      if (!nullish.nullish(id = sub.threadId)) return dyeThreadId(id);
+      if (!nullish.nullish(id = ((_sub$process2 = sub.process) !== null && _sub$process2 !== void 0 ? _sub$process2 : sub).pid)) return dyePid(id);
+    }
+
+    return says.ros(String(sub));
+  }
+
+  return prefix + ':' + suffix(sub);
 };
 
 exports.by = by;
+exports.byAgent = byAgent;
+exports.byMaster = byMaster;
+exports.byWorker = byWorker;
