@@ -1,0 +1,1 @@
+export { Institute } from './src/Institute'

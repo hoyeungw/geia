@@ -6,10 +6,10 @@ import sleep                from 'mz-modules/sleep'
 
 export const terminate = function* (subProcess, timeout) {
   const { pid } = (subProcess.process ?? subProcess)
-  const childPids = yield descendantPids(pid)
+  const pids = yield descendantPids(pid)
   yield [
     killProcess(subProcess, timeout),
-    killChildren(childPids, timeout),
+    killDescendants(pids, timeout),
   ]
 }
 
@@ -25,9 +25,9 @@ function* killProcess(subProcess, timeout) {
 }
 
 // kill all children processes, if SIGTERM not work, try SIGKILL
-function* killChildren(children, timeout) {
-  if (!children.length) return
-  kill(children, SIGTERM)
+function* killDescendants(pids, timeout) {
+  if (!pids.length) return
+  kill(pids, SIGTERM)
 
   const start = Date.now()
   // if timeout is 1000, it will check twice.
@@ -36,7 +36,7 @@ function* killChildren(children, timeout) {
 
   while (Date.now() - start < timeout - checkInterval) {
     yield sleep(checkInterval)
-    unterminated = getUnterminatedProcesses(children)
+    unterminated = getUnterminatedProcesses(pids)
     if (!unterminated.length) return
   }
   kill(unterminated, SIGKILL)

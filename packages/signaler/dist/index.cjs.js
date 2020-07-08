@@ -229,8 +229,8 @@ const terminate = function* (subProcess, timeout) {
   const {
     pid
   } = (_subProcess$process = subProcess.process) !== null && _subProcess$process !== void 0 ? _subProcess$process : subProcess;
-  const childPids = yield descendantPids(pid);
-  yield [killProcess(subProcess, timeout), killChildren(childPids, timeout)];
+  const pids = yield descendantPids(pid);
+  yield [killProcess(subProcess, timeout), killDescendants(pids, timeout)];
 }; // kill process, if SIGTERM not work, try SIGKILL
 
 function* killProcess(subProcess, timeout) {
@@ -244,9 +244,9 @@ function* killProcess(subProcess, timeout) {
 } // kill all children processes, if SIGTERM not work, try SIGKILL
 
 
-function* killChildren(children, timeout) {
-  if (!children.length) return;
-  kill(children, enumSignals.SIGTERM);
+function* killDescendants(pids, timeout) {
+  if (!pids.length) return;
+  kill(pids, enumSignals.SIGTERM);
   const start = Date.now(); // if timeout is 1000, it will check twice.
 
   const checkInterval = 400;
@@ -254,7 +254,7 @@ function* killChildren(children, timeout) {
 
   while (Date.now() - start < timeout - checkInterval) {
     yield sleep(checkInterval);
-    unterminated = getUnterminatedProcesses(children);
+    unterminated = getUnterminatedProcesses(pids);
     if (!unterminated.length) return;
   }
 
@@ -285,47 +285,71 @@ function getUnterminatedProcesses(pids) {
 const SIGNALER = 'signaler';
 const TIMEOUT = 1800;
 const logger = says.says[SIGNALER].attach(timestampPretty.dateTime);
+/**
+ * @typedef {NodeJS.Process} Process
+ * @typedef {module:child_process.ChildProcess} ChildProcess
+ * @typedef {Array|NodeJS.Dict<Worker>} WorkerHashTable
+ *
+ * @typedef {Object} SignalerConfig
+ * @typedef {boolean}         [SignalerConfig.closed]
+ * @typedef {Process}         [SignalerConfig.process]
+ * @typedef {WorkerHashTable} [SignalerConfig.workers]
+ * @typedef {ChildProcess}    [SignalerConfig.agent]
+ * @typedef {string[]}        [SignalerConfig.signals]
+ */
+
 class Signaler {
   /**
    * SIGINT kill(2) Ctrl-C
    * SIGQUIT kill(3) Ctrl-\
    * SIGTERM kill(15) default
    *
-   * @param {Object|EventEmitter} instance
-   * @param {Object|EventEmitter} instance.agent
-   * @param {boolean} instance.closed
-   * @param {NodeJS.Process} subProcess
-   * @param {string[]} [signals]
+   * @param {SignalerConfig} o
    */
-  static register(instance, subProcess, signals = [enumSignals.SIGINT, enumSignals.SIGQUIT, enumSignals.SIGTERM]) {
+  static register(o) {
+    var _o$signals;
+
+    const signals = (_o$signals = o.signals) !== null && _o$signals !== void 0 ? _o$signals : [enumSignals.SIGINT, enumSignals.SIGQUIT, enumSignals.SIGTERM];
+    if (!o.process) o.process = process;
+    if (!o.workers) o.workers = cluster.workers;
+
     for (let signal of signals) {
-      subProcess.once(signal, processOnSignal.bind(instance, signal));
+      o.process.once(signal, processOnSignal.bind(o, signal));
     }
 
-    subProcess.once(enumEvents.EXIT, processOnExit.bind(instance));
+    o.process.once(enumEvents.EXIT, processOnExit.bind(o));
   }
 
 }
 function processOnSignal(signal) {
   var _ref;
 
-  if (this.closed) return;
-  _ref = `receive signal ${says.ros(signal)}, closing`, logger(_ref);
-  this.closed = true;
+  /** @type {Signaler}  */
   const context = this;
+  /** @type {Process}  */
+
+  const proc = context.process;
+
+  if (context.closed) {
+    return void 0;
+  } else {
+    context.closed = true;
+  }
+
+  _ref = `receive signal ${says.ros(signal)}, closing`, logger(_ref);
   co(function* () {
     try {
       var _ref2;
 
-      yield genCloseWorkers(cluster.workers);
-      yield genCloseAgent(context.agent);
+      yield genCloseWorkers.call(context, context.workers, proc.env.LEA_APP_CLOSE_TIMEOUT || proc.env.LEA_MASTER_CLOSE_TIMEOUT || TIMEOUT);
+      yield genCloseAgent.call(context, context.agent, proc.env.LEA_AGENT_CLOSE_TIMEOUT || proc.env.LEA_MASTER_CLOSE_TIMEOUT || TIMEOUT);
       _ref2 = `close done, exiting with code: ${says.ros('0')}`, logger(_ref2);
-      process.exit(0);
+      proc.exit(0);
     } catch (e) {
       var _ref3;
 
       _ref3 = `close with error: ${e}`, logger(_ref3);
-      process.exit(1);
+      proc.exit(1);
     }
   });
 }
@@ -334,10 +358,15 @@ function processOnExit(code) {
 
   _ref4 = `exit with code: ${says.ros(String(code))}`, logger(_ref4);
 }
-function* genCloseWorkers(workers) {
+function* genCloseWorkers(workers, timeout) {
   var _ref5, _ref6;
 
-  const timeout = process.env.LEA_APP_CLOSE_TIMEOUT || process.env.LEA_MASTER_CLOSE_TIMEOUT || TIMEOUT;
+  if (!workers) {
+    var _workersNotSetSki;
+
+    return void (_workersNotSetSki = 'workers not set, skip closing workers', logger(_workersNotSetSki));
+  }
+
   _ref5 = `send kill ${says.ros(enumSignals.SIGTERM)} to ${says.ros(enumRoles.APP)} workers, will exit with code ${says.ros('0')} after ${timeout}ms`, logger(_ref5);
   _ref6 = `wait ${timeout}ms`, logger(_ref6);
 
@@ -349,10 +378,15 @@ function* genCloseWorkers(workers) {
     _ref7 = `${says.ros(enumRoles.APP)} workers exit error: ${e}`, logger(_ref7);
   }
 }
-function* genCloseAgent(agent) {
+function* genCloseAgent(agent, timeout) {
   var _ref8, _ref9;
 
-  const timeout = process.env.LEA_AGENT_CLOSE_TIMEOUT || process.env.LEA_MASTER_CLOSE_TIMEOUT || TIMEOUT;
+  if (!agent) {
+    var _agentNotSetSkip;
+
+    return void (_agentNotSetSkip = 'agent not set, skip closing agent', logger(_agentNotSetSkip));
+  }
+
   _ref8 = `send kill ${says.ros(enumSignals.SIGTERM)} to ${says.ros(enumRoles.AGENT)} worker, will exit with code ${says.ros('0')} after ${timeout}ms`, logger(_ref8);
   _ref9 = `wait ${timeout}ms`, logger(_ref9);
 

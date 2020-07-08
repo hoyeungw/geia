@@ -1,4 +1,4 @@
-# @geia/cluster-fork
+# @geia/cluster-institute
 
 [![npm version][badge-npm-version]][url-npm]
 [![npm download monthly][badge-npm-download-monthly]][url-npm]
@@ -10,31 +10,31 @@
 [![github commit total][badge-github-commit-count]][url-github]
 
 [//]: <> (Shields)
-[badge-npm-version]: https://flat.badgen.net/npm/v/@geia/cluster-fork
-[badge-npm-download-monthly]: https://flat.badgen.net/npm/dm/@geia/cluster-fork
-[badge-npm-download-total]:https://flat.badgen.net/npm/dt/@geia/cluster-fork
-[badge-npm-dependents]: https://flat.badgen.net/npm/dependents/@geia/cluster-fork
-[badge-npm-license]: https://flat.badgen.net/npm/license/@geia/cluster-fork
-[badge-pp-install-size]: https://flat.badgen.net/packagephobia/install/@geia/cluster-fork
+[badge-npm-version]: https://flat.badgen.net/npm/v/@geia/cluster-institute
+[badge-npm-download-monthly]: https://flat.badgen.net/npm/dm/@geia/cluster-institute
+[badge-npm-download-total]:https://flat.badgen.net/npm/dt/@geia/cluster-institute
+[badge-npm-dependents]: https://flat.badgen.net/npm/dependents/@geia/cluster-institute
+[badge-npm-license]: https://flat.badgen.net/npm/license/@geia/cluster-institute
+[badge-pp-install-size]: https://flat.badgen.net/packagephobia/install/@geia/cluster-institute
 [badge-github-last-commit]: https://flat.badgen.net/github/last-commit/hoyeungw/geia
 [badge-github-commit-count]: https://flat.badgen.net/github/commits/hoyeungw/geia
 
 [//]: <> (Link)
-[url-npm]: https://npmjs.org/package/@geia/cluster-fork
-[url-pp]: https://packagephobia.now.sh/result?p=@geia/cluster-fork
+[url-npm]: https://npmjs.org/package/@geia/cluster-institute
+[url-pp]: https://packagephobia.now.sh/result?p=@geia/cluster-institute
 [url-github]: https://github.com/hoyeungw/geia
 
 ##### Fork cluster with configs
 
 #### Install
 ```console
-$ npm install @geia/cluster-fork
+$ npm install @geia/cluster-institute
 ```
 
 #### Usage
 ```js
-import { ClusterFork } from '@geia/cluster-fork'
-ClusterFork.build({ exec:'path-to-worker/worker.js', env:{} })
+import { Institute } from '@geia/cluster-institute'
+Institute.build({ exec:'path-to-worker/worker.js', env:{} })
 ```
 
 #### Meta

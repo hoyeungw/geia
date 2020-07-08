@@ -11,59 +11,70 @@ const SIGNALER = 'signaler'
 const TIMEOUT = 1800
 const logger = says[SIGNALER].attach(dateTime)
 
+
+/**
+ * @typedef {NodeJS.Process} Process
+ * @typedef {module:child_process.ChildProcess} ChildProcess
+ * @typedef {Array|NodeJS.Dict<Worker>} WorkerHashTable
+ *
+ * @typedef {Object} SignalerConfig
+ * @typedef {boolean}         [SignalerConfig.closed]
+ * @typedef {Process}         [SignalerConfig.process]
+ * @typedef {WorkerHashTable} [SignalerConfig.workers]
+ * @typedef {ChildProcess}    [SignalerConfig.agent]
+ * @typedef {string[]}        [SignalerConfig.signals]
+ */
+
 export class Signaler {
   /**
    * SIGINT kill(2) Ctrl-C
    * SIGQUIT kill(3) Ctrl-\
    * SIGTERM kill(15) default
    *
-   * @param {Object|EventEmitter} instance
-   * @param {Object|EventEmitter} instance.agent
-   * @param {boolean} instance.closed
-   * @param {NodeJS.Process} subProcess
-   * @param {string[]} [signals]
+   * @param {SignalerConfig} o
    */
-  static register(instance, subProcess, signals = [SIGINT, SIGQUIT, SIGTERM]) {
+  static register(o) {
+    const signals = o.signals ?? [SIGINT, SIGQUIT, SIGTERM]
+    if (!o.process) o.process = process
+    if (!o.workers) o.workers = cluster.workers
     for (let signal of signals) {
-      subProcess.once(signal, processOnSignal.bind(instance, signal))
+      o.process.once(signal, processOnSignal.bind(o, signal))
     }
-    subProcess.once(EXIT, processOnExit.bind(instance))
+    o.process.once(EXIT, processOnExit.bind(o))
   }
 }
 
 export function processOnSignal(signal) {
-  if (this.closed) return;
+  /** @type {Signaler}  */ const context = this
+  /** @type {Process}  */ const proc = context.process
+  if (context.closed) { return void 0 } else { context.closed = true }
   `receive signal ${ ros(signal) }, closing` |> logger
-  this.closed = true
-  const context = this
   co(function* () {
     try {
-      yield genCloseWorkers(cluster.workers)
-      yield genCloseAgent(context.agent);
+      yield genCloseWorkers.call(context, context.workers, proc.env.LEA_APP_CLOSE_TIMEOUT || proc.env.LEA_MASTER_CLOSE_TIMEOUT || TIMEOUT)
+      yield genCloseAgent.call(context, context.agent, proc.env.LEA_AGENT_CLOSE_TIMEOUT || proc.env.LEA_MASTER_CLOSE_TIMEOUT || TIMEOUT);
       `close done, exiting with code: ${ ros('0') }` |> logger
-      process.exit(0)
+      proc.exit(0)
     }
     catch (e) {
       `close with error: ${ e }` |> logger
-      process.exit(1)
+      proc.exit(1)
     }
   })
 }
 
-export function processOnExit(code) {
-  `exit with code: ${ ros(String(code)) }`  |> logger
-}
+export function processOnExit(code) { `exit with code: ${ ros(String(code)) }`  |> logger }
 
-export function* genCloseWorkers(workers) {
-  const timeout = process.env.LEA_APP_CLOSE_TIMEOUT || process.env.LEA_MASTER_CLOSE_TIMEOUT || TIMEOUT;
+export function* genCloseWorkers(workers, timeout) {
+  if (!workers) { return void ('workers not set, skip closing workers' |> logger) }
   `send kill ${ ros(SIGTERM) } to ${ ros(APP) } workers, will exit with code ${ ros('0') } after ${ timeout }ms` |> logger;
   `wait ${ timeout }ms` |> logger
   try { yield killAppWorkers(workers, timeout) }
   catch (e) { `${ ros(APP) } workers exit error: ${ e }`  |> logger }
 }
 
-export function* genCloseAgent(agent) {
-  const timeout = process.env.LEA_AGENT_CLOSE_TIMEOUT || process.env.LEA_MASTER_CLOSE_TIMEOUT || TIMEOUT;
+export function* genCloseAgent(agent, timeout) {
+  if (!agent) { return void ('agent not set, skip closing agent' |> logger) }
   `send kill ${ ros(SIGTERM) } to ${ ros(AGENT) } worker, will exit with code ${ ros('0') } after ${ timeout }ms` |> logger;
   `wait ${ timeout }ms` |> logger
   try { yield killAgentWorker(agent, timeout) }
