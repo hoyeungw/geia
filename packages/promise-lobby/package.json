@@ -1,0 +1,61 @@
+{
+  "name": "@geia/promise-lobby",
+  "version": "0.0.7",
+  "description": "Limit concurrency of an array of class instance whose async method is to be called",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "pub": "npm publish",
+    "test": "node -r @babel/register test/test.index.js"
+  },
+  "dependencies": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoyeungw/geia.git"
+  },
+  "keywords": [
+    "race",
+    "limit",
+    "limited",
+    "concurrency",
+    "promise",
+    "async",
+    "es6",
+    "es7",
+    "promises",
+    "promises-a",
+    "promises-aplus",
+    "future",
+    "futures",
+    "deferred",
+    "deferreds",
+    "generator",
+    "generators",
+    "await",
+    "flow control",
+    "pool",
+    "queue",
+    "throttle",
+    "browser",
+    "node",
+    "throat",
+    "rate",
+    "batch",
+    "ratelimit",
+    "task",
+    "bluebird"
+  ],
+  "author": "Hoyeung Wong",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hoyeungw/geia"
+  },
+  "homepage": "https://github.com/hoyeungw/geia#readme"
+}

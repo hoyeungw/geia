@@ -20,7 +20,7 @@
     "@geia/enum-roles": "^0.0.7",
     "@geia/enum-signals": "^0.0.7",
     "@palett/says": "^0.4.2",
-    "@spare/logger": "^0.8.0",
+    "@spare/logger": "^0.8.1",
     "@valjoux/timestamp-pretty": "^0.1.10",
     "await-event": "^2.1.0",
     "co": "^4.6.0",
