@@ -1,6 +1,6 @@
 {
   "name": "@geia/descendant-pids",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Get descendant pids of a process",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
