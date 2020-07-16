@@ -13,7 +13,7 @@ class Guest {
 }
 
 const test = async () => {
-  const result = await promiseLobby(
+  const result = await promiseLobby.call(
     Guest.prototype.goto,
     [Guest.build(1), Guest.build(2)],
     [500, 2500, 1500, 1000, 200, 200]
