@@ -2,25 +2,30 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
 var enumEvents = require('@geia/enum-events');
 var enumRoles = require('@geia/enum-roles');
 var enumSignals = require('@geia/enum-signals');
 var says = require('@palett/says');
 var timestampPretty = require('@valjoux/timestamp-pretty');
-var cluster = _interopDefault(require('cluster'));
-var co = _interopDefault(require('co'));
-var descendantPids = _interopDefault(require('@geia/descendant-pids'));
-var awaitEvent = _interopDefault(require('await-event'));
+var cluster = require('cluster');
+var co = require('co');
+var descendantPids = require('@geia/descendant-pids');
+var awaitEvent = require('await-event');
+
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+var cluster__default = /*#__PURE__*/_interopDefaultLegacy(cluster);
+var co__default = /*#__PURE__*/_interopDefaultLegacy(co);
+var descendantPids__default = /*#__PURE__*/_interopDefaultLegacy(descendantPids);
+var awaitEvent__default = /*#__PURE__*/_interopDefaultLegacy(awaitEvent);
 
 function createCommonjsModule(fn, basedir, module) {
 	return module = {
-	  path: basedir,
-	  exports: {},
-	  require: function (path, base) {
-      return commonjsRequire(path, (base === undefined || base === null) ? module.path : base);
-    }
+		path: basedir,
+		exports: {},
+		require: function (path, base) {
+			return commonjsRequire(path, (base === undefined || base === null) ? module.path : base);
+		}
 	}, fn(module, module.exports), module.exports;
 }
 
@@ -229,13 +234,13 @@ const terminate = function* (subProcess, timeout) {
   const {
     pid
   } = (_subProcess$process = subProcess.process) !== null && _subProcess$process !== void 0 ? _subProcess$process : subProcess;
-  const pids = yield descendantPids(pid);
+  const pids = yield descendantPids__default['default'](pid);
   yield [killProcess(subProcess, timeout), killDescendants(pids, timeout)];
 }; // kill process, if SIGTERM not work, try SIGKILL
 
 function* killProcess(subProcess, timeout) {
   subProcess.kill(enumSignals.SIGTERM);
-  yield Promise.race([awaitEvent(subProcess, enumEvents.EXIT), sleep(timeout)]);
+  yield Promise.race([awaitEvent__default['default'](subProcess, enumEvents.EXIT), sleep(timeout)]);
   if (subProcess.killed) return; // SIGKILL: http://man7.org/linux/man-pages/man7/signal.7.html
   // worker: https://github.com/nodejs/node/blob/master/lib/internal/cluster/worker.js#L22
   // subProcess.kill is wrapped to subProcess.destroy, it will wait to disconnected.
@@ -311,7 +316,7 @@ class Signaler {
 
     const signals = (_o$signals = o.signals) !== null && _o$signals !== void 0 ? _o$signals : [enumSignals.SIGINT, enumSignals.SIGQUIT, enumSignals.SIGTERM];
     if (!o.process) o.process = process;
-    if (!o.workers) o.workers = cluster.workers;
+    if (!o.workers) o.workers = cluster__default['default'].workers;
 
     for (let signal of signals) {
       o.process.once(signal, processOnSignal.bind(o, signal));
@@ -337,7 +342,7 @@ function processOnSignal(signal) {
   }
 
   _ref = `receive signal ${says.ros(signal)}, closing`, logger(_ref);
-  co(function* () {
+  co__default['default'](function* () {
     try {
       var _ref2;
 
@@ -400,7 +405,7 @@ function* genCloseAgent(agent, timeout) {
 }
 
 const killAppWorkers = function (workers, timeout) {
-  return co(function* () {
+  return co__default['default'](function* () {
     yield Object.keys(workers).map(id => {
       const worker = workers[id];
       worker.disableRefork = true;
@@ -428,7 +433,7 @@ const killAgentWorker = function (agent, timeout) {
     agent.removeAllListeners();
   }
 
-  return co(function* () {
+  return co__default['default'](function* () {
     yield terminate(agent, timeout);
   });
 };

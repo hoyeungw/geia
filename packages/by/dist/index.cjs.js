@@ -11,6 +11,7 @@ var nullish = require('@typen/nullish');
 var enumFontEffects = require('@palett/enum-font-effects');
 var presets = require('@palett/presets');
 var projector = require('@palett/projector');
+var enumColorSpace = require('@palett/enum-color-space');
 
 const pigShade = projector.Pigment({
   min: 0,
@@ -45,11 +46,12 @@ const dyePid = pid => {
 
 // import threads from 'worker_threads'
 
+const dyeFactory = dye.DyeFactory.prep(enumColorSpace.HEX);
 const Dyes = {};
-Dyes[enumRoles.WORKER] = dye.HexDye(cards.Palett.grey.accent_2);
-Dyes[enumRoles.MASTER] = dye.HexDye(cards.Palett.amber.base);
-Dyes[enumRoles.AGENT] = dye.HexDye(cards.Palett.green.accent_2);
-Dyes[enumRoles.MAIN] = dye.HexDye(cards.Palett.orange.base);
+Dyes[enumRoles.WORKER] = dyeFactory(cards.Palett.grey.accent_2);
+Dyes[enumRoles.MASTER] = dyeFactory(cards.Palett.amber.base);
+Dyes[enumRoles.AGENT] = dyeFactory(cards.Palett.green.accent_2);
+Dyes[enumRoles.MAIN] = dyeFactory(cards.Palett.orange.base);
 const byAgent = (sub, name) => Dyes[enumRoles.AGENT](name !== null && name !== void 0 ? name : enumRoles.AGENT) + ':' + dyePid(sub.pid);
 const byMaster = (sub, name) => Dyes[enumRoles.MASTER](name !== null && name !== void 0 ? name : enumRoles.MASTER) + ':' + dyePid(sub.pid);
 const byWorker = (sub, name) => {

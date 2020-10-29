@@ -1,12 +1,13 @@
 import { WORKER, MASTER, AGENT, MAIN } from '@geia/enum-roles';
 import { Palett } from '@palett/cards';
-import { HexDye } from '@palett/dye';
+import { DyeFactory } from '@palett/dye';
 import { ros } from '@palett/says';
 import { OBJ, NUM } from '@typen/enum-data-types';
 import { nullish } from '@typen/nullish';
 import { BOLD } from '@palett/enum-font-effects';
 import { SUBTLE, INSTA } from '@palett/presets';
 import { Pigment } from '@palett/projector';
+import { HEX } from '@palett/enum-color-space';
 
 const pigShade = Pigment({
   min: 0,
@@ -41,11 +42,12 @@ const dyePid = pid => {
 
 // import threads from 'worker_threads'
 
+const dyeFactory = DyeFactory.prep(HEX);
 const Dyes = {};
-Dyes[WORKER] = HexDye(Palett.grey.accent_2);
-Dyes[MASTER] = HexDye(Palett.amber.base);
-Dyes[AGENT] = HexDye(Palett.green.accent_2);
-Dyes[MAIN] = HexDye(Palett.orange.base);
+Dyes[WORKER] = dyeFactory(Palett.grey.accent_2);
+Dyes[MASTER] = dyeFactory(Palett.amber.base);
+Dyes[AGENT] = dyeFactory(Palett.green.accent_2);
+Dyes[MAIN] = dyeFactory(Palett.orange.base);
 const byAgent = (sub, name) => Dyes[AGENT](name !== null && name !== void 0 ? name : AGENT) + ':' + dyePid(sub.pid);
 const byMaster = (sub, name) => Dyes[MASTER](name !== null && name !== void 0 ? name : MASTER) + ':' + dyePid(sub.pid);
 const byWorker = (sub, name) => {

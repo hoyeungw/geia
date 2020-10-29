@@ -1,17 +1,19 @@
 import { AGENT, MAIN, MASTER, WORKER } from '@geia/enum-roles'
 import { Palett }                      from '@palett/cards'
-import { HexDye }                      from '@palett/dye'
+import { DyeFactory }                  from '@palett/dye'
 import { ros }                         from '@palett/says'
 import { NUM, OBJ }                    from '@typen/enum-data-types'
 import { nullish }                     from '@typen/nullish'
 import { dyePid, dyeThreadId }         from './dyePid'
+import { HEX }                         from '@palett/enum-color-space'
 // import cluster from 'cluster'
 // import threads from 'worker_threads'
+const dyeFactory = DyeFactory.prep(HEX)
 const Dyes = {}
-Dyes[WORKER] = HexDye(Palett.grey.accent_2)
-Dyes[MASTER] = HexDye(Palett.amber.base)
-Dyes[AGENT] = HexDye(Palett.green.accent_2)
-Dyes[MAIN] = HexDye(Palett.orange.base)
+Dyes[WORKER] = dyeFactory(Palett.grey.accent_2)
+Dyes[MASTER] = dyeFactory(Palett.amber.base)
+Dyes[AGENT] = dyeFactory(Palett.green.accent_2)
+Dyes[MAIN] = dyeFactory(Palett.orange.base)
 
 
 export const byAgent = (sub, name) => (Dyes[AGENT](name ?? AGENT) + ':' + dyePid(sub.pid))

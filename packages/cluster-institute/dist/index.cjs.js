@@ -2,8 +2,6 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
 var by = require('@geia/by');
 var enumEvents = require('@geia/enum-events');
 var enumRoles = require('@geia/enum-roles');
@@ -12,8 +10,13 @@ var enumLoggers = require('@spare/enum-loggers');
 var logger = require('@spare/logger');
 var nullish = require('@typen/nullish');
 var timestampPretty = require('@valjoux/timestamp-pretty');
-var cluster = _interopDefault(require('cluster'));
-var os = _interopDefault(require('os'));
+var cluster = require('cluster');
+var os = require('os');
+
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+var cluster__default = /*#__PURE__*/_interopDefaultLegacy(cluster);
+var os__default = /*#__PURE__*/_interopDefaultLegacy(os);
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -116,11 +119,11 @@ class Institute {
 
     _defineProperty(this, "unexpectedCount", 0);
 
-    if (cluster.isWorker) {
+    if (cluster__default['default'].isWorker) {
       return void 0;
     }
 
-    this.count = (_p$count = p.count) !== null && _p$count !== void 0 ? _p$count : os.cpus().length - 1 || 1;
+    this.count = (_p$count = p.count) !== null && _p$count !== void 0 ? _p$count : os__default['default'].cpus().length - 1 || 1;
     this.refork = (_p$refork = p.refork) !== null && _p$refork !== void 0 ? _p$refork : true;
     this.limit = p.limit || 60;
     this.duration = p.duration || 60000;
@@ -165,23 +168,23 @@ class Institute {
         settings.args = args;
       }
 
-      cluster.setupMaster(settings);
+      cluster__default['default'].setupMaster(settings);
     }
 
-    cluster.on(enumEvents.DISCONNECT, this.onDisconnect.bind(this));
-    cluster.on(enumEvents.EXIT, this.onExit.bind(this)); // defer to set the listeners, so that these listeners can be customized
+    cluster__default['default'].on(enumEvents.DISCONNECT, this.onDisconnect.bind(this));
+    cluster__default['default'].on(enumEvents.EXIT, this.onExit.bind(this)); // defer to set the listeners, so that these listeners can be customized
 
     defer(() => {
       if (!process.listeners(enumEvents.UNCAUGHT_EXCEPTION).length) {
         process.on(enumEvents.UNCAUGHT_EXCEPTION, this.onUncaughtException.bind(this));
       }
 
-      if (!cluster.listeners(UNEXPECTED_EXIT).length) {
-        cluster.on(UNEXPECTED_EXIT, this.onUnexpectedExit.bind(this));
+      if (!cluster__default['default'].listeners(UNEXPECTED_EXIT).length) {
+        cluster__default['default'].on(UNEXPECTED_EXIT, this.onUnexpectedExit.bind(this));
       }
 
-      if (!cluster.listeners(REACH_REFORK_LIMIT).length) {
-        cluster.on(REACH_REFORK_LIMIT, this.onReachReforkLimit.bind(this));
+      if (!cluster__default['default'].listeners(REACH_REFORK_LIMIT).length) {
+        cluster__default['default'].on(REACH_REFORK_LIMIT, this.onReachReforkLimit.bind(this));
       }
     });
     let worker;
@@ -214,7 +217,7 @@ class Institute {
 
 
   getCluster() {
-    return cluster;
+    return cluster__default['default'];
   }
 
   graduate({
@@ -224,9 +227,9 @@ class Institute {
   } = {}) {
     var _ref;
 
-    if (settings) cluster.setupMaster(settings);
-    const worker = cluster.fork(env);
-    worker[GENE] = (_ref = gene !== null && gene !== void 0 ? gene : settings) !== null && _ref !== void 0 ? _ref : cluster.settings;
+    if (settings) cluster__default['default'].setupMaster(settings);
+    const worker = cluster__default['default'].fork(env);
+    worker[GENE] = (_ref = gene !== null && gene !== void 0 ? gene : settings) !== null && _ref !== void 0 ? _ref : cluster__default['default'].settings;
     return worker;
   }
   /** allow refork */
@@ -241,7 +244,7 @@ class Institute {
       this.reforks.shift();
     }
 
-    return this.withinForkLimit || (cluster.emit(REACH_REFORK_LIMIT), false);
+    return this.withinForkLimit || (cluster__default['default'].emit(REACH_REFORK_LIMIT), false);
   }
 
   get withinForkLimit() {
@@ -330,7 +333,7 @@ class Institute {
       _ref9 = `new ${by.by(newWorker, enumRoles.WORKER)} fork (state: ${newWorker.state})`, logger$1(_ref9);
     }
 
-    cluster.emit(UNEXPECTED_EXIT, worker, code, signal);
+    cluster__default['default'].emit(UNEXPECTED_EXIT, worker, code, signal);
   }
 
   onUncaughtException(err) {

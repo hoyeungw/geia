@@ -1,17 +1,19 @@
 import { MASTER, WORKER } from '@geia/enum-roles'
 import { Palett }         from '@palett/cards'
-import { HexDye }         from '@palett/dye'
+import { DyeFactory }     from '@palett/dye'
 import { BOLD }           from '@palett/enum-font-effects'
 import { INSTA, SUBTLE }  from '@palett/presets'
 import { Pigment }        from '@palett/projector'
 import { says }           from '@palett/says'
 import { dateTime }       from '@valjoux/timestamp-pretty'
+import { HEX }            from '@palett/enum-color-space'
 
 const pigFore = Pigment({ min: 0, max: 99 }, SUBTLE)
 const pigMid = Pigment({ min: 0, max: 9 }, INSTA, [BOLD])
 const pigEnd = Pigment({ min: 0, max: 99 }, INSTA, [BOLD])
-const dyeWorker = HexDye(Palett.grey.accent_2)
-const dyeMaster = HexDye(Palett.amber.base)
+const dyeFactory = DyeFactory.prep(HEX)
+const dyeWorker = dyeFactory(Palett.grey.accent_2)
+const dyeMaster = dyeFactory(Palett.amber.base)
 
 export const WritesMaster = function (name) { return sub => says[dyeMaster(name) + ':' + dyePid(sub.pid)].p(dateTime()) }
 export const WritesWorker = function (name) { return sub => says[dyeWorker(name) + ':' + dyePid(sub.pid)].p(dateTime()) }
