@@ -24,16 +24,16 @@ const test = async () => {
     .getCluster()
     .on(FORK, worker => {
       worker.disableRefork = true;
-      `[ ${ byWorker(worker) } ] new worker start` |> says[byWorker(worker)].p(dateTime())
+      `[ ${byWorker(worker)} ] new worker start` |> says[byWorker(worker)].p(dateTime())
     })
     .on(LISTENING, worker => {
-      `[${ byWorker(worker) } ] new worker listening` |> says[byWorker(worker)].p(dateTime())
+      `[${byWorker(worker)} ] new worker listening` |> says[byWorker(worker)].p(dateTime())
       worker.send('Hello worker:' + deco({ id: worker.id, pid: worker.process.pid }))
     })
-    .on(DISCONNECT, worker => {`[${ byWorker(worker) }] on [${ DISCONNECT }] disconnected` |> logger })
+    .on(DISCONNECT, worker => {`[${byWorker(worker)}] on [${DISCONNECT}] disconnected` |> logger })
     .on(EXIT, (worker, code, signal) => {
-      `[${ byWorker(worker) }] on [${ EXIT }] exited with ${ deco(
-        { code, signal, exitCode: worker.process.exitCode }) }` |> logger
+      `[${byWorker(worker)}] on [${EXIT}] exited with ${deco(
+        { code, signal, exitCode: worker.process.exitCode })}` |> logger
     })
   Signaler.register({
     process: process,

@@ -19,18 +19,9 @@ var co__default = /*#__PURE__*/_interopDefaultLegacy(co);
 var descendantPids__default = /*#__PURE__*/_interopDefaultLegacy(descendantPids);
 var awaitEvent__default = /*#__PURE__*/_interopDefaultLegacy(awaitEvent);
 
-function createCommonjsModule(fn, basedir, module) {
-	return module = {
-		path: basedir,
-		exports: {},
-		require: function (path, base) {
-			return commonjsRequire(path, (base === undefined || base === null) ? module.path : base);
-		}
-	}, fn(module, module.exports), module.exports;
-}
-
-function commonjsRequire () {
-	throw new Error('Dynamic requires are not currently supported by @rollup/plugin-commonjs');
+function createCommonjsModule(fn) {
+  var module = { exports: {} };
+	return fn(module, module.exports), module.exports;
 }
 
 /**
@@ -223,7 +214,7 @@ var koSleep = createCommonjsModule(function (module, exports) {
     });
   };
 
-  module.exports = exports = sleep;
+  module.exports = sleep;
 });
 
 var sleep = koSleep;

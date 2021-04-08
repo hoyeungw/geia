@@ -1,4 +1,4 @@
-import { WORKER, MASTER, AGENT, MAIN } from '@geia/enum-roles';
+import { AGENT, MASTER, WORKER, MAIN } from '@geia/enum-roles';
 import { Palett } from '@palett/cards';
 import { DyeFactory } from '@palett/dye';
 import { ros } from '@palett/says';

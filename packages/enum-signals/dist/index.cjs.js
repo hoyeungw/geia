@@ -2,8 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const 
-/* 01 */
+const /* 01 */
 SIGHUP = 'SIGHUP',
 
 /* 02 */

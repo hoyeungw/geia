@@ -160,7 +160,7 @@ class Institute {
         // enable pid in child process coverage filename
         const args = ['cover', '--report', 'none', '--print', 'none', '--include-pid', settings.exec];
 
-        if (settings === null || settings === void 0 ? void 0 : (_settings$args = settings.args) === null || _settings$args === void 0 ? void 0 : _settings$args.length) {
+        if (settings !== null && settings !== void 0 && (_settings$args = settings.args) !== null && _settings$args !== void 0 && _settings$args.length) {
           args.push('--', ...settings.args);
         }
 
@@ -187,10 +187,9 @@ class Institute {
         cluster__default['default'].on(REACH_REFORK_LIMIT, this.onReachReforkLimit.bind(this));
       }
     });
-    let worker;
 
     for (let i = 0; i < this.count; i++) {
-      worker = this.graduate();
+      this.graduate();
     } // fork slaves after workers are forked
 
 
@@ -198,7 +197,7 @@ class Institute {
       const slaves = Array.isArray(p.slaves) ? p.slaves : [p.slaves];
 
       for (const settings of slaves.map(this.normalizeSlaveConfig)) if (settings) {
-        worker = this.graduate({
+        this.graduate({
           settings
         });
       }
@@ -265,7 +264,7 @@ class Institute {
       worker
     }))})`, logger$1(_ref2);
 
-    if (worker === null || worker === void 0 ? void 0 : worker.isDead()) {
+    if (worker !== null && worker !== void 0 && worker.isDead()) {
       var _ref3;
 
       // worker has terminated before disconnect
