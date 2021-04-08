@@ -24,7 +24,8 @@ const
   assert = require('assert'),
   path = require('path'),
   fs = require('fs'),
-  cp = require('child_process')
+  cp = require('child_process'),
+  alias = require('@geia/tui-alias')
 
 /**
  * Tput
@@ -1458,9 +1459,9 @@ Tput.prototype.translateTermcap = function (info) {
     return out
   })()
 
-  // Translate termcap cap names to terminfo cap names.
-  // e.g. `up` -> `cursor_up`
-  [ 'bools', 'numbers', 'strings' ].forEach(function (key) {
+    // Translate termcap cap names to terminfo cap names.
+    // e.g. `up` -> `cursor_up`
+    ['bools', 'numbers', 'strings'].forEach(function (key) {
     out[key] = {}
     Object.keys(info[key]).forEach(function (cap) {
       if (key === 'strings') {
@@ -2340,7 +2341,7 @@ function sprintf(src) {
  * Aliases
  */
 
-Tput._alias = require('./tools/alias')
+Tput._alias = alias // require('./tools/alias')
 
 Tput.alias = {};
 

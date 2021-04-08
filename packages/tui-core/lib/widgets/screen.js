@@ -7,11 +7,13 @@
 /**
  * Modules
  */
-const path = require('path'),
+const
+  path = require('path'),
   fs = require('fs'),
   cp = require('child_process')
 
-const colors = require('../tools/colors'),
+const
+  colors = require('../tools/colors'),
   program = require('../program'),
   unicode = require('../tools/unicode')
 
@@ -194,9 +196,7 @@ Screen.total = 0
 Screen.instances = []
 
 Screen.bind = function (screen) {
-  if (!Screen.global) {
-    Screen.global = screen
-  }
+  if (!Screen.global) Screen.global = screen
 
   if (!~Screen.instances.indexOf(screen)) {
     Screen.instances.push(screen)

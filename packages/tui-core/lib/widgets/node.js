@@ -16,10 +16,7 @@ const EventEmitter = require('../tools/events').EventEmitter
 function Node(options) {
   const self = this
   const Screen = require('./screen')
-
-  if (!(this instanceof Node)) {
-    return new Node(options)
-  }
+  if (!(this instanceof Node)) return new Node(options)
 
   EventEmitter.call(this)
 
@@ -63,13 +60,9 @@ function Node(options) {
   this.uid = Node.uid++
   this.index = this.index != null ? this.index : -1
 
-  if (this.type !== 'screen') {
-    this.detached = true
-  }
+  if (this.type !== 'screen') this.detached = true
 
-  if (this.parent) {
-    this.parent.append(this)
-  }
+  if (this.parent) this.parent.append(this)
 
   (options.children || []).forEach(this.append.bind(this))
 }

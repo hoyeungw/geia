@@ -19,6 +19,7 @@
     "test": "node -r @babel/register test/test.index.js"
   },
   "dependencies": {
+    "@geia/tui-alias": "^0.0.13",
     "@geia/tui-events": "^0.0.13"
   },
   "repository": "git://github.com/chjj/blessed.git",
