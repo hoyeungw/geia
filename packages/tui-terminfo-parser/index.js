@@ -1,5 +1,3 @@
-import Tput, { sprintf, tryRead } from './src/tput'
+import { sprintf, Tput, tryRead } from './src/tput'
 
-export { sprintf, tryRead }
-
-export default Tput
+export { Tput, sprintf, tryRead }

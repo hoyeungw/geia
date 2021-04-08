@@ -2996,7 +2996,4 @@ Tput.utoa = Tput.prototype.utoa = {
  * Expose
  */
 
-export { sprintf }
-export { tryRead }
-
-export default Tput
+export { sprintf, tryRead, Tput }

@@ -14,6 +14,11 @@
     "pub": "npm publish",
     "test": "node -r @babel/register test/test.index.js"
   },
+  "dependencies": {
+    "@geia/tui-terminfo-parser": "^0.0.17",
+    "@geia/tui-colors": "^0.0.17",
+    "@geia/tui-events": "^0.0.17"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hoyeungw/geia/tui-program.git"
