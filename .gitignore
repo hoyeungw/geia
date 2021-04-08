@@ -1,4 +1,5 @@
 .idea
+.yarn
 temp
 node_modules
 yarn.lock
