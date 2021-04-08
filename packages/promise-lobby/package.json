@@ -58,5 +58,6 @@
   "bugs": {
     "url": "https://github.com/hoyeungw/geia"
   },
-  "homepage": "https://github.com/hoyeungw/geia#readme"
+  "homepage": "https://github.com/hoyeungw/geia#readme",
+  "gitHead": "bcc3c7bf1341df4dc3dcf4b1f4df1f9dc42c001a"
 }

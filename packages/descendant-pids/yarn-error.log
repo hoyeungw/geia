@@ -17,12 +17,12 @@ Trace:
   Error: https://registry.yarnpkg.com/@geia%2fenum-roles: Not found
       at Request.params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:66987:18)
       at Request.self.callback (/usr/local/lib/node_modules/yarn/lib/cli.js:140748:22)
-      at Request.emit (events.js:315:20)
+      at Request.emit (alias.js:315:20)
       at Request.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:141720:10)
-      at Request.emit (events.js:315:20)
+      at Request.emit (alias.js:315:20)
       at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:141642:12)
-      at Object.onceWrapper (events.js:421:28)
-      at IncomingMessage.emit (events.js:327:22)
+      at Object.onceWrapper (alias.js:421:28)
+      at IncomingMessage.emit (alias.js:327:22)
       at endReadableNT (_stream_readable.js:1224:12)
       at processTicksAndRejections (internal/process/task_queues.js:84:21)
 
@@ -69,7 +69,7 @@ npm manifest:
     },
     "repository": {
       "type": "git",
-      "url": "git+https://github.com/hoyeungw/mcore/cluster.git"
+      "url": "git+https://github.com/hoyeungw/geia/cluster.git"
     },
     "keywords": [
       "chalk",
@@ -82,9 +82,9 @@ npm manifest:
     },
     "license": "MIT",
     "bugs": {
-      "url": "https://github.com/hoyeungw/mcore/cluster"
+      "url": "https://github.com/hoyeungw/geia/cluster"
     },
-    "homepage": "https://github.com/hoyeungw/mcore/cluster#readme"
+    "homepage": "https://github.com/hoyeungw/geia/cluster#readme"
   }
 
 yarn manifest: 

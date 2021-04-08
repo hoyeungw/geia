@@ -1,7 +1,7 @@
 {
-  "name": "@geia/signaler",
+  "name": "@geia/tui-alias",
   "version": "0.0.12",
-  "description": "Register exit and signal handlers to process",
+  "description": "Alias for tui",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "files": [
@@ -14,28 +14,15 @@
     "pub": "npm publish",
     "test": "node -r @babel/register test/test.index.js"
   },
-  "dependencies": {
-    "@geia/descendant-pids": "^0.0.12",
-    "@geia/enum-events": "^0.0.12",
-    "@geia/enum-roles": "^0.0.12",
-    "@geia/enum-signals": "^0.0.12",
-    "@palett/says": "^0.7.5",
-    "@spare/logger": "^0.11.12",
-    "@valjoux/timestamp-pretty": "^0.2.5",
-    "await-event": "^2.1.0",
-    "co": "^4.6.0",
-    "mz-modules": "^2.1.0",
-    "ps-tree": "^1.2.0"
-  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hoyeungw/geia/cluster.git"
+    "url": "git+https://github.com/hoyeungw/geia/tui-alias.git"
   },
   "keywords": [
     "geia",
     "process",
     "signal-handler",
-    "signaler"
+    "tui-alias"
   ],
   "author": {
     "name": "Hoyeung Wong",

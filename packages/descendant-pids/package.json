@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hoyeungw/mcore/cluster.git"
+    "url": "git+https://github.com/hoyeungw/geia/cluster.git"
   },
   "keywords": [
     "geia",
@@ -35,7 +35,8 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hoyeungw/mcore/cluster"
+    "url": "https://github.com/hoyeungw/geia/cluster"
   },
-  "homepage": "https://github.com/hoyeungw/mcore/cluster#readme"
+  "homepage": "https://github.com/hoyeungw/geia/cluster#readme",
+  "gitHead": "bcc3c7bf1341df4dc3dcf4b1f4df1f9dc42c001a"
 }

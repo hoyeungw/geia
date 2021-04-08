@@ -11,6 +11,13 @@
   ],
   "bin": "./bin/tput.js",
   "preferGlobal": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "pub": "npm publish",
+    "test": "node -r @babel/register test/test.index.js"
+  },
   "dependencies": {
     "@geia/tui-events": "^0.0.12"
   },
