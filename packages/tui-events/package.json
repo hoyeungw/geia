@@ -1,6 +1,6 @@
 {
   "name": "@geia/tui-events",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "EventEmitter for tui",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
