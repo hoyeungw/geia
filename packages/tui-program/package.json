@@ -1,7 +1,7 @@
 {
   "name": "@geia/tui-program",
-  "version": "0.0.16",
-  "description": "Unicode for tui",
+  "version": "0.0.17",
+  "description": "Curses like basic functionality for tui",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "files": [

@@ -1,6 +1,6 @@
 {
   "name": "@geia/tui-terminfo-parser",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Terminfo parser for tui",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -13,6 +13,9 @@
   "scripts": {
     "pub": "npm publish",
     "test": "node -r @babel/register test/test.index.js"
+  },
+  "dependencies": {
+    "@geia/tui-alias": "^0.0.17"
   },
   "repository": {
     "type": "git",
