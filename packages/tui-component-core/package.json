@@ -1,6 +1,6 @@
 {
   "name": "@geia/tui-component-core",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Core components for tui",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
