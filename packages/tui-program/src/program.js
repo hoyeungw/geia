@@ -4268,5 +4268,4 @@ function merge(out) {
 /**
  * Expose
  */
-
-module.exports = Program
+export default Program
