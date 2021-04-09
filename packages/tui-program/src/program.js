@@ -11,11 +11,17 @@ import cp                from 'child_process'
 import fs                from 'fs'
 import { StringDecoder } from 'string_decoder'
 import util              from 'util'
+import { gpmClient }     from './gpmclient'
+import * as keys         from './keys'
 
 const slice = Array.prototype.slice
 
 const nextTick = global.setImmediate || process.nextTick.bind(process)
 
+export function build(options) {
+  console.log('>>> [about to create tui program]')
+  return new Program(options)
+}
 /**
  * Program
  */
@@ -23,6 +29,7 @@ export class Program extends EventEmitter {
   type = 'program'
   constructor(options) {
     super()
+    console.log("programmed")
     const self = this
 
     // if (!(this instanceof Program)) return new Program(options)
@@ -105,6 +112,10 @@ export class Program extends EventEmitter {
     if (options.tput !== false) this.setupTput()
 
     this.listen()
+  }
+  static build(options) {
+    console.log('>>> [about to create tui program]')
+    return new Program(options)
   }
   static global = null
   static total = 0
@@ -343,8 +354,7 @@ export class Program extends EventEmitter {
   }
 
   _listenInput() {
-    const keys = require('./keys'),
-      self = this
+    const self = this
 
     // Input
     this.input.on('keypress', this.input._keypressHandler = function (ch, key) {
@@ -864,33 +874,23 @@ export class Program extends EventEmitter {
           : b === 2 ? 'middle'
           : b === 5 ? 'right'
             : 'unknown'
-
       self.emit('mouse', key)
-
       return
     }
-
     if (parts = /^\x1b\[(O|I)/.exec(s)) {
       key.action = parts[1] === 'I'
         ? 'focus'
         : 'blur'
-
       self.emit('mouse', key)
       self.emit(key.action)
-
-
     }
   }
 
 // gpm support for linux vc
   enableGpm() {
     const self = this
-    const gpmclient = require('./gpmclient')
-
     if (this.gpm) return
-
-    this.gpm = gpmclient()
-
+    this.gpm = gpmClient()
     this.gpm.on('btndown', function (btn, modifier, x, y) {
       x--, y--
 
@@ -4254,8 +4254,3 @@ function merge(out) {
   })
   return out
 }
-
-/**
- * Expose
- */
-export default Program

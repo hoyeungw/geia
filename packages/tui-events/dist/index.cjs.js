@@ -71,9 +71,11 @@ class EventEmitter {
   }
 
   once(type, listener) {
+    const self = this;
+
     function on() {
-      this.removeListener(type, on);
-      return listener.apply(this, arguments);
+      self.removeListener(type, on);
+      return listener.apply(self, arguments);
     }
 
     on.listener = listener;

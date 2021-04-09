@@ -8,7 +8,9 @@ export class EventEmitter {
   /**
    * EventEmitter
    */
-  constructor() { if (!this._events) this._events = {} }
+  constructor() {
+    if (!this._events) this._events = {}
+  }
   setMaxListeners(n) {
     this._maxListeners = n
   }
@@ -48,9 +50,10 @@ export class EventEmitter {
     }
   }
   once(type, listener) {
+    const self = this
     function on() {
-      this.removeListener(type, on)
-      return listener.apply(this, arguments)
+      self.removeListener(type, on)
+      return listener.apply(self, arguments)
     }
     on.listener = listener
     return this.on(type, on)

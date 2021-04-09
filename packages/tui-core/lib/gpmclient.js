@@ -90,9 +90,7 @@ function parseEvent(raw) {
 }
 
 function GpmClient(options) {
-  if (!(this instanceof GpmClient)) {
-    return new GpmClient(options)
-  }
+  if (!(this instanceof GpmClient)) return new GpmClient(options)
 
   EventEmitter.call(this)
 

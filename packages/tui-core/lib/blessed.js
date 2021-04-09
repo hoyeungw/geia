@@ -8,25 +8,23 @@
  * Blessed
  */
 
-function blessed() {
-  return blessed.program.apply(null, arguments);
-}
+function blessed() { return blessed.program(...arguments) }
 
-blessed.program = blessed.Program = require('./program');
-blessed.tput = blessed.Tput = require('./tput');
-blessed.widget = require('./widget');
-blessed.colors = require('./tools/colors');
-blessed.unicode = require('./tools/unicode');
-blessed.helpers = require('./tools/helpers');
+blessed.program = blessed.Program = require('./program').build
+blessed.tput = blessed.Tput = require('./tput')
+blessed.widget = require('./widget')
+blessed.colors = require('./tools/colors')
+blessed.unicode = require('./tools/unicode')
+blessed.helpers = require('./tools/helpers')
 
-blessed.helpers.sprintf = blessed.tput.sprintf;
-blessed.helpers.tryRead = blessed.tput.tryRead;
-blessed.helpers.merge(blessed, blessed.helpers);
+blessed.helpers.sprintf = blessed.tput.sprintf
+blessed.helpers.tryRead = blessed.tput.tryRead
+blessed.helpers.merge(blessed, blessed.helpers)
 
-blessed.helpers.merge(blessed, blessed.widget);
+blessed.helpers.merge(blessed, blessed.widget)
 
 /**
  * Expose
  */
 
-module.exports = blessed;
+module.exports = blessed

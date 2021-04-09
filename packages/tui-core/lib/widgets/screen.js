@@ -12,7 +12,7 @@ const path = require('path'),
   cp = require('child_process')
 
 const colors = require('../tools/colors'),
-  program = require('../program'),
+  program = require('../program').build,
   unicode = require('../tools/unicode')
 
 const nextTick = global.setImmediate || process.nextTick.bind(process)
@@ -31,20 +31,17 @@ const Box = require('./box')
 function Screen(options) {
   const self = this
 
-  if (!(this instanceof Node)) {
-    return new Screen(options)
-  }
+  if (!(this instanceof Node)) return new Screen(options)
 
   Screen.bind(this)
 
   options = options || {}
-  if (options.rsety && options.listen) {
-    options = { program: options }
-  }
+  if (options.rsety && options.listen) options = { program: options }
 
   this.program = options.program
 
   if (!this.program) {
+    console.log('>>> [making program again]')
     this.program = program({
       input: options.input,
       output: options.output,

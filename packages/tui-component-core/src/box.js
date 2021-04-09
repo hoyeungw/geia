@@ -7,8 +7,8 @@
 /**
  * Modules
  */
-const Node = require('./node')
-const Element = require('./element')
+import Node    from './node'
+import Element from './element'
 
 /**
  * Box

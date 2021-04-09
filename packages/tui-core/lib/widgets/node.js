@@ -17,9 +17,7 @@ function Node(options) {
   const self = this
   const Screen = require('./screen')
 
-  if (!(this instanceof Node)) {
-    return new Node(options)
-  }
+  if (!(this instanceof Node)) return new Node(options)
 
   EventEmitter.call(this)
 
