@@ -1,6 +1,6 @@
 {
   "name": "@geia/cluster-institute",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "Fork cluster with configs",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -15,9 +15,9 @@
     "test": "node -r @babel/register test/test.index.js"
   },
   "dependencies": {
-    "@geia/by": "^0.0.17",
-    "@geia/enum-events": "^0.0.17",
-    "@geia/enum-roles": "^0.0.17",
+    "@geia/by": "^0.0.18",
+    "@geia/enum-events": "^0.0.18",
+    "@geia/enum-roles": "^0.0.18",
     "@palett/cards": "^0.7.5",
     "@palett/dye": "^0.7.5",
     "@palett/enum-color-space": "^0.7.5",
