@@ -19,7 +19,7 @@ const nextTick = global.setImmediate || process.nextTick.bind(process)
 /**
  * Program
  */
-class Program extends EventEmitter {
+export class Program extends EventEmitter {
   type = 'program'
   constructor(options) {
     super()

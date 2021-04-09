@@ -2305,9 +2305,7 @@ Tput.alias.micro_col_size.push('micro_char_size');
 Tput.aliasMap = {};
 Object.keys(Tput.alias).forEach(function (key) {
   Tput.aliasMap[key] = key;
-  Tput.alias[key].forEach(function (k) {
-    Tput.aliasMap[k] = key;
-  });
+  Tput.alias[key].forEach(k => Tput.aliasMap[k] = key);
 });
 
 Tput.prototype.has = function (name) {

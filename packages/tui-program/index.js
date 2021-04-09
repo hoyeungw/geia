@@ -1,1 +1,1 @@
-export const some = ""
+export { Program } from './src/program'

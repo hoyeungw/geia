@@ -18,21 +18,6 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 var cluster__default = /*#__PURE__*/_interopDefaultLegacy(cluster);
 var os__default = /*#__PURE__*/_interopDefaultLegacy(os);
 
-function _defineProperty(obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-}
-
 const UNEXPECTED_EXIT = 'unexpectedExit';
 const REACH_REFORK_LIMIT = 'reachReforkLimit';
 
@@ -97,27 +82,17 @@ class Institute {
   constructor(p = {}) {
     var _p$count, _p$refork;
 
-    _defineProperty(this, "name", by.by(process, enumRoles.MASTER));
-
-    _defineProperty(this, "logger", says.says[this.name].attach(timestampPretty.dateTime));
-
-    _defineProperty(this, "count", void 0);
-
-    _defineProperty(this, "refork", void 0);
-
-    _defineProperty(this, "limit", void 0);
-
-    _defineProperty(this, "duration", void 0);
-
-    _defineProperty(this, "reforks", []);
-
-    _defineProperty(this, "attachedEnv", void 0);
-
-    _defineProperty(this, "disconnects", {});
-
-    _defineProperty(this, "disconnectCount", 0);
-
-    _defineProperty(this, "unexpectedCount", 0);
+    this.name = by.by(process, enumRoles.MASTER);
+    this.logger = says.says[this.name].attach(timestampPretty.dateTime);
+    this.count = void 0;
+    this.refork = void 0;
+    this.limit = void 0;
+    this.duration = void 0;
+    this.reforks = [];
+    this.attachedEnv = void 0;
+    this.disconnects = {};
+    this.disconnectCount = 0;
+    this.unexpectedCount = 0;
 
     if (cluster__default['default'].isWorker) {
       return void 0;
