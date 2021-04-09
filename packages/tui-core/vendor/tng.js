@@ -22,9 +22,7 @@ function PNG(file, options) {
     , idat
     , pixels;
 
-  if (!(this instanceof PNG)) {
-    return new PNG(file, options);
-  }
+  if (!(this instanceof PNG)) return new PNG(file, options)
 
   if (!file) throw new Error('no file');
 
