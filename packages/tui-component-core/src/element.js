@@ -7,18 +7,14 @@
 /**
  * Modules
  */
-const assert = require('assert')
+import assert from 'assert'
 
-const
-  colors = require('../tools/colors'),
-  unicode = require('../tools/unicode')
+import Node    from './node'
+import helpers from '../tools/helpers'
+import unicode from '../tools/unicode'
+import colors  from '../tools/colors'
 
 const nextTick = global.setImmediate || process.nextTick.bind(process)
-
-const helpers = require('../tools/helpers')
-
-const Node = require('./node')
-
 /**
  * Element
  */
@@ -2569,5 +2565,4 @@ Element.prototype.screenshot = function (xi, xl, yi, yl) {
 /**
  * Expose
  */
-
-module.exports = Element
+export default Element

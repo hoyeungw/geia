@@ -7,13 +7,11 @@
 /**
  * Modules
  */
-const util = require('util')
+import util           from 'util'
+import Node           from './node'
+import ScrollableText from './scrollabletext'
 
 const nextTick = global.setImmediate || process.nextTick.bind(process)
-
-const Node = require('./node')
-const ScrollableText = require('./scrollabletext')
-
 /**
  * Log
  */
@@ -78,5 +76,4 @@ Log.prototype.scroll = function (offset, always) {
 /**
  * Expose
  */
-
-module.exports = Log
+export default Log

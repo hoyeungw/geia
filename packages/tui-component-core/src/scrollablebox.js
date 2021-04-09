@@ -7,8 +7,8 @@
 /**
  * Modules
  */
-const Node = require('./node')
-const Box = require('./box')
+import Node from './node'
+import Box  from './box'
 
 /**
  * ScrollableBox
@@ -384,5 +384,4 @@ ScrollableBox.prototype.setScrollPerc = function (i) {
 /**
  * Expose
  */
-
-module.exports = ScrollableBox
+export default ScrollableBox

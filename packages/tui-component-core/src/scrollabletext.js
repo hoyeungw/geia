@@ -7,8 +7,8 @@
 /**
  * Modules
  */
-const Node = require('./node')
-const ScrollableBox = require('./scrollablebox')
+import Node          from './node'
+import ScrollableBox from './scrollablebox'
 
 /**
  * ScrollableText
@@ -30,5 +30,4 @@ ScrollableText.prototype.type = 'scrollable-text'
 /**
  * Expose
  */
-
-module.exports = ScrollableText
+export default ScrollableText

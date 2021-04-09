@@ -27,5 +27,4 @@ Box.prototype.type = 'box'
 /**
  * Expose
  */
-
-module.exports = Box
+export default Box

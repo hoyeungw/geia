@@ -7,7 +7,7 @@
 /**
  * Modules
  */
-const EventEmitter = require('../tools/events').EventEmitter
+import { EventEmitter } from '../tools/events'
 
 /**
  * Node
@@ -277,5 +277,4 @@ Node.prototype.set = function (name, value) {
 /**
  * Expose
  */
-
-module.exports = Node
+export default Node

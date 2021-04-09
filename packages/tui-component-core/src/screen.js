@@ -4,26 +4,22 @@
  * https://github.com/chjj/blessed
  */
 
+import path    from 'path'
+import fs      from 'fs'
 /**
  * Modules
  */
-const path = require('path'),
-  fs = require('fs'),
-  cp = require('child_process')
-
-const colors = require('../tools/colors'),
-  program = require('../program'),
-  unicode = require('../tools/unicode')
+import cp      from 'child_process'
+import colors  from '../tools/colors'
+import program from '../program'
+import unicode from '../tools/unicode'
+import helpers from '../tools/helpers'
+import Node    from './node'
+import Log     from './log'
+import Element from './element'
+import Box     from './box'
 
 const nextTick = global.setImmediate || process.nextTick.bind(process)
-
-const helpers = require('../tools/helpers')
-
-const Node = require('./node')
-const Log = require('./log')
-const Element = require('./element')
-const Box = require('./box')
-
 /**
  * Screen
  */
@@ -2293,5 +2289,4 @@ Object.keys(angleTable).forEach(function (key) {
 /**
  * Expose
  */
-
-module.exports = Screen
+export default Screen
