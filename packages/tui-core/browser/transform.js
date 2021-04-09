@@ -63,7 +63,6 @@ function readMethods() {
   Tput.cpaths = [];
   Tput.termcap = TERMCAP;
 
-  Tput.prototype._readTermcap = Tput.prototype.readTermcap;
   Tput.prototype.readTermcap = function() {
     this.terminal = TERMCAP_NAME;
     return this._readTermcap(this.terminal);
