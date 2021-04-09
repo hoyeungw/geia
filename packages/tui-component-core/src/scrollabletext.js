@@ -10,22 +10,18 @@
 import Node          from './node'
 import ScrollableBox from './scrollablebox'
 
-/**
- * ScrollableText
- */
-
-function ScrollableText(options) {
-  if (!(this instanceof Node)) {
-    return new ScrollableText(options)
+class ScrollableText extends ScrollableBox {
+  type = 'scrollable-text'
+  /**
+   * ScrollableText
+   */
+  constructor(options = {}) {
+    options.alwaysScroll = true
+    super(options)
+    if (!(this instanceof Node)) return new ScrollableText(options)
   }
-  options = options || {}
-  options.alwaysScroll = true
-  ScrollableBox.call(this, options)
 }
 
-ScrollableText.prototype.__proto__ = ScrollableBox.prototype
-
-ScrollableText.prototype.type = 'scrollable-text'
 
 /**
  * Expose

@@ -4,25 +4,23 @@
  * https://github.com/chjj/blessed
  */
 
-/**
- * Modules
- */
-import Node    from './node'
 import Element from './element'
 
 /**
- * Box
+ * Modules
  */
 
-function Box(options) {
-  if (!(this instanceof Node)) return new Box(options)
-  options = options || {}
-  Element.call(this, options)
+class Box extends Element {
+  type = 'box'
+  /**
+   * Box
+   */
+  constructor(options = {}) {
+    super(options) // if (!(this instanceof Node)) return new Box(options)
+  }
+  static build(options) { return new Box(options) }
 }
 
-Box.prototype.__proto__ = Element.prototype
-
-Box.prototype.type = 'box'
 
 /**
  * Expose

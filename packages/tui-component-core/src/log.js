@@ -12,43 +12,34 @@ import Node           from './node'
 import ScrollableText from './scrollabletext'
 
 const nextTick = global.setImmediate || process.nextTick.bind(process)
-/**
- * Log
- */
 
-function Log(options) {
-  const self = this
+class Log extends ScrollableText {
+  /**
+   * Log
+   */
+  constructor(options = {}) {
+    super(options)
+    const self = this
+    if (!(this instanceof Node)) return new Log(options)
 
-  if (!(this instanceof Node)) {
-    return new Log(options)
+    this.scrollback = options.scrollback != null
+      ? options.scrollback
+      : Infinity
+    this.scrollOnInput = options.scrollOnInput
+
+    this.on('set content', function () {
+      if (!self._userScrolled || self.scrollOnInput) {
+        nextTick(function () {
+          self.setScrollPerc(100)
+          self._userScrolled = false
+          self.screen.render()
+        })
+      }
+    })
+    this.type = 'log'
+    this._scroll = Log.prototype.scroll
   }
-
-  options = options || {}
-
-  ScrollableText.call(this, options)
-
-  this.scrollback = options.scrollback != null
-    ? options.scrollback
-    : Infinity
-  this.scrollOnInput = options.scrollOnInput
-
-  this.on('set content', function () {
-    if (!self._userScrolled || self.scrollOnInput) {
-      nextTick(function () {
-        self.setScrollPerc(100)
-        self._userScrolled = false
-        self.screen.render()
-      })
-    }
-  })
-}
-
-Log.prototype.__proto__ = ScrollableText.prototype
-
-Log.prototype.type = 'log'
-
-Log.prototype.log =
-  Log.prototype.add = function () {
+  log() {
     const args = Array.prototype.slice.call(arguments)
     if (typeof args[0] === 'object') {
       args[0] = util.inspect(args[0], true, 20, true)
@@ -61,17 +52,30 @@ Log.prototype.log =
     }
     return ret
   }
-
-Log.prototype._scroll = Log.prototype.scroll
-Log.prototype.scroll = function (offset, always) {
-  if (offset === 0) return this._scroll(offset, always)
-  this._userScrolled = true
-  const ret = this._scroll(offset, always)
-  if (this.getScrollPerc() === 100) {
-    this._userScrolled = false
+  add() {
+    const args = Array.prototype.slice.call(arguments)
+    if (typeof args[0] === 'object') {
+      args[0] = util.inspect(args[0], true, 20, true)
+    }
+    const text = util.format.apply(util, args)
+    this.emit('log', text)
+    const ret = this.pushLine(text)
+    if (this._clines.fake.length > this.scrollback) {
+      this.shiftLine(0, (this.scrollback / 3) | 0)
+    }
+    return ret
   }
-  return ret
+  scroll(offset, always) {
+    if (offset === 0) return this._scroll(offset, always)
+    this._userScrolled = true
+    const ret = this._scroll(offset, always)
+    if (this.getScrollPerc() === 100) {
+      this._userScrolled = false
+    }
+    return ret
+  }
 }
+
 
 /**
  * Expose
