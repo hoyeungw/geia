@@ -7,14 +7,14 @@
 /**
  * Modules
  */
-import util           from 'util'
-import Node           from './node'
-import ScrollableText from './scrollabletext'
+import util               from 'util'
+import { Node }           from './node'
+import { ScrollableText } from './scrollabletext'
 
 const nextTick = global.setImmediate || process.nextTick.bind(process)
 
 export class Log extends ScrollableText {
-  type='log'
+  type = 'log'
   /**
    * Log
    */
@@ -39,19 +39,7 @@ export class Log extends ScrollableText {
     })
     this._scroll = Log.prototype.scroll
   }
-  log() {
-    const args = Array.prototype.slice.call(arguments)
-    if (typeof args[0] === 'object') {
-      args[0] = util.inspect(args[0], true, 20, true)
-    }
-    const text = util.format.apply(util, args)
-    this.emit('log', text)
-    const ret = this.pushLine(text)
-    if (this._clines.fake.length > this.scrollback) {
-      this.shiftLine(0, (this.scrollback / 3) | 0)
-    }
-    return ret
-  }
+  log = this.add // log() { return this.add() }
   add() {
     const args = Array.prototype.slice.call(arguments)
     if (typeof args[0] === 'object') {
@@ -65,6 +53,7 @@ export class Log extends ScrollableText {
     }
     return ret
   }
+  _scroll = this.scroll
   scroll(offset, always) {
     if (offset === 0) return this._scroll(offset, always)
     this._userScrolled = true

@@ -4,9 +4,6 @@
  * https://github.com/chjj/blessed
  */
 
-/**
- * Modules
- */
 import { EventEmitter } from '@geia/tui-events'
 
 export class Node extends EventEmitter {
