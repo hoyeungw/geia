@@ -22,11 +22,7 @@ function match(r1, g1, b1) {
   }
 
   const hash = r1 << 16 | g1 << 8 | b1;
-
-  if (_cache[hash] != null) {
-    return _cache[hash];
-  }
-
+  if (_cache[hash] != null) return _cache[hash];
   let ldiff = Infinity,
       li = -1,
       i = 0,

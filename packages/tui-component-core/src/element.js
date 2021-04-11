@@ -4,15 +4,17 @@
  * https://github.com/chjj/blessed
  */
 
-/**
- * Modules
- */
-import assert  from 'assert'
 import * as colors  from '@geia/tui-colors'
 import * as helpers from '@geia/tui-helpers'
 import * as unicode from '@geia/tui-unicode'
+/**
+ * Modules
+ */
+import assert       from 'assert'
 
-import Node from './node'
+import { Node } from './node'
+
+import { ScrollableBox } from './scrollablebox'
 
 const nextTick = global.setImmediate || process.nextTick.bind(process)
 
@@ -21,32 +23,27 @@ export class Element extends Node {
   /**
    * Element
    */
-  constructor(options) {
-    super()
+  constructor(options = {}) {
+    super(options)
     const self = this
-
-    if (!(this instanceof Node)) { return new Element(options)}
-
-    options = options || {}
-
+    if (!(this instanceof Node)) { return new Element(options) }
     // Workaround to get a `scrollable` option.
     if (options.scrollable && !this._ignore && this.type !== 'scrollable-box') {
-      const ScrollableBox = require('./scrollablebox')
-      Object.getOwnPropertyNames(ScrollableBox.prototype).forEach(function (key) {
-        if (key === 'type') return
-        Object.defineProperty(this, key,
-          Object.getOwnPropertyDescriptor(ScrollableBox.prototype, key))
-      }, this)
+      Object
+        .getOwnPropertyNames(ScrollableBox.prototype)
+        .forEach(
+          function (key) {
+            if (key === 'type') return
+            Object.defineProperty(this, key, Object.getOwnPropertyDescriptor(ScrollableBox.prototype, key))
+          },
+          this
+        )
       this._ignore = true
       ScrollableBox.call(this, options)
       delete this._ignore
       return this
     }
-
-    super(options)
-
     this.name = options.name
-
     options.position = options.position || {
       left: options.left,
       right: options.right,
@@ -216,6 +213,188 @@ export class Element extends Node {
     if (options.focused) this.focus()
     this._render = Element.prototype.render
   }
+
+  get focused() { return this.screen.focused === this}
+  get visible() {
+    let el = this
+    do {
+      if (el.detached) return false
+      if (el.hidden) return false
+      // if (!el.lpos) return false;
+      // if (el.position.width === 0 || el.position.height === 0) return false;
+    } while ((el = el.parent))
+    return true
+  }
+  get _detached() {
+    let el = this
+    do {
+      if (el.type === 'screen') return false
+      if (!el.parent) return true
+    } while ((el = el.parent))
+    return false
+  }
+  get draggable() { return this._draggable === true}
+  set draggable(draggable) { return draggable ? this.enableDrag(draggable) : this.disableDrag() }
+
+  /**
+   * Positioning
+   */
+  get width() { return this._getWidth(false) }
+  get height() { return this._getHeight(false) }
+  get aleft() { return this._getLeft(false) }
+  get aright() { return this._getRight(false) }
+  get atop() { return this._getTop(false) }
+  get abottom() { return this._getBottom(false) }
+  get rleft() { return this.aleft - this.parent.aleft }
+  get rright() { return this.aright - this.parent.aright }
+  get rtop() { return this.atop - this.parent.atop }
+  get rbottom() { return this.abottom - this.parent.abottom }
+
+  /**
+   * Position Setters
+   */
+// NOTE:
+// For aright, abottom, right, and bottom:
+// If position.bottom is null, we could simply set top instead.
+// But it wouldn't replicate bottom behavior appropriately if
+// the parent was resized, etc.
+  set width(val) {
+    if (this.position.width === val) return
+    if (/^\d+$/.test(val)) val = +val
+    this.emit('resize')
+    this.clearPos()
+    return this.position.width = val
+  }
+  set height(val) {
+    if (this.position.height === val) return
+    if (/^\d+$/.test(val)) val = +val
+    this.emit('resize')
+    this.clearPos()
+    return this.position.height = val
+  }
+  set aleft(val) {
+    let expr
+    if (typeof val === 'string') {
+      if (val === 'center') {
+        val = this.screen.width / 2 | 0
+        val -= this.width / 2 | 0
+      } else {
+        expr = val.split(/(?=\+|-)/)
+        val = expr[0]
+        val = +val.slice(0, -1) / 100
+        val = this.screen.width * val | 0
+        val += +(expr[1] || 0)
+      }
+    }
+    val -= this.parent.aleft
+    if (this.position.left === val) return
+    this.emit('move')
+    this.clearPos()
+    return this.position.left = val
+  }
+  set aright(val) {
+    val -= this.parent.aright
+    if (this.position.right === val) return
+    this.emit('move')
+    this.clearPos()
+    return this.position.right = val
+  }
+  set atop(val) {
+    let expr
+    if (typeof val === 'string') {
+      if (val === 'center') {
+        val = this.screen.height / 2 | 0
+        val -= this.height / 2 | 0
+      } else {
+        expr = val.split(/(?=\+|-)/)
+        val = expr[0]
+        val = +val.slice(0, -1) / 100
+        val = this.screen.height * val | 0
+        val += +(expr[1] || 0)
+      }
+    }
+    val -= this.parent.atop
+    if (this.position.top === val) return
+    this.emit('move')
+    this.clearPos()
+    return this.position.top = val
+  }
+  set abottom(val) {
+    val -= this.parent.abottom
+    if (this.position.bottom === val) return
+    this.emit('move')
+    this.clearPos()
+    return this.position.bottom = val
+  }
+  set rleft(val) {
+    if (this.position.left === val) return
+    if (/^\d+$/.test(val)) val = +val
+    this.emit('move')
+    this.clearPos()
+    return this.position.left = val
+  }
+  set rright(val) {
+    if (this.position.right === val) return
+    this.emit('move')
+    this.clearPos()
+    return this.position.right = val
+  }
+  set rtop(val) {
+    if (this.position.top === val) return
+    if (/^\d+$/.test(val)) val = +val
+    this.emit('move')
+    this.clearPos()
+    return this.position.top = val
+  }
+  set rbottom(val) {
+    if (this.position.bottom === val) return
+    this.emit('move')
+    this.clearPos()
+    return this.position.bottom = val
+  }
+  get ileft() {
+    return (this.border ? 1 : 0) + this.padding.left
+    // return (this.border && this.border.left ? 1 : 0) + this.padding.left;
+  }
+  get itop() {
+    return (this.border ? 1 : 0) + this.padding.top
+    // return (this.border && this.border.top ? 1 : 0) + this.padding.top;
+  }
+  get iright() {
+    return (this.border ? 1 : 0) + this.padding.right
+    // return (this.border && this.border.right ? 1 : 0) + this.padding.right;
+  }
+  get ibottom() {
+    return (this.border ? 1 : 0) + this.padding.bottom
+    // return (this.border && this.border.bottom ? 1 : 0) + this.padding.bottom;
+  }
+  get iwidth() {
+    // return (this.border
+    //   ? ((this.border.left ? 1 : 0) + (this.border.right ? 1 : 0)) : 0)
+    //   + this.padding.left + this.padding.right;
+    return (this.border ? 2 : 0) + this.padding.left + this.padding.right
+  }
+  get iheight() {
+    // return (this.border
+    //   ? ((this.border.top ? 1 : 0) + (this.border.bottom ? 1 : 0)) : 0)
+    //   + this.padding.top + this.padding.bottom;
+    return (this.border ? 2 : 0) + this.padding.top + this.padding.bottom
+  }
+  get tpadding() { return this.padding.left + this.padding.top + this.padding.right + this.padding.bottom }
+
+  /**
+   * Relative coordinates as default properties
+   */
+
+  get left() { return this.rleft }
+  get right() { return this.rright }
+  get top() { return this.rtop }
+  get bottom() { return this.rbottom }
+  set left(val) { return this.rleft = val }
+  set right(val) { return this.rright = val }
+  set top(val) { return this.rtop = val }
+  set bottom(val) { return this.rbottom = val }
+
   sattr(style, fg, bg) {
     let
       bold = style.bold,
@@ -2224,267 +2403,3 @@ export class Element extends Node {
     return this.screen.screenshot(xi, xl, yi, yl)
   }
 }
-
-Element.prototype.__defineGetter__('focused', function () {
-  return this.screen.focused === this
-})
-
-Element.prototype.__defineGetter__('visible', function () {
-  let el = this
-  do {
-    if (el.detached) return false
-    if (el.hidden) return false
-    // if (!el.lpos) return false;
-    // if (el.position.width === 0 || el.position.height === 0) return false;
-  } while (el = el.parent)
-  return true
-})
-
-Element.prototype.__defineGetter__('_detached', function () {
-  let el = this
-  do {
-    if (el.type === 'screen') return false
-    if (!el.parent) return true
-  } while (el = el.parent)
-  return false
-})
-
-Element.prototype.__defineGetter__('draggable', function () {
-  return this._draggable === true
-})
-
-Element.prototype.__defineSetter__('draggable', function (draggable) {
-  return draggable ? this.enableDrag(draggable) : this.disableDrag()
-})
-
-/**
- * Positioning
- */
-
-Element.prototype.__defineGetter__('width', function () {
-  return this._getWidth(false)
-})
-
-Element.prototype.__defineGetter__('height', function () {
-  return this._getHeight(false)
-})
-
-Element.prototype.__defineGetter__('aleft', function () {
-  return this._getLeft(false)
-})
-
-Element.prototype.__defineGetter__('aright', function () {
-  return this._getRight(false)
-})
-
-Element.prototype.__defineGetter__('atop', function () {
-  return this._getTop(false)
-})
-
-Element.prototype.__defineGetter__('abottom', function () {
-  return this._getBottom(false)
-})
-
-Element.prototype.__defineGetter__('rleft', function () {
-  return this.aleft - this.parent.aleft
-})
-
-Element.prototype.__defineGetter__('rright', function () {
-  return this.aright - this.parent.aright
-})
-
-Element.prototype.__defineGetter__('rtop', function () {
-  return this.atop - this.parent.atop
-})
-
-Element.prototype.__defineGetter__('rbottom', function () {
-  return this.abottom - this.parent.abottom
-})
-
-/**
- * Position Setters
- */
-
-// NOTE:
-// For aright, abottom, right, and bottom:
-// If position.bottom is null, we could simply set top instead.
-// But it wouldn't replicate bottom behavior appropriately if
-// the parent was resized, etc.
-Element.prototype.__defineSetter__('width', function (val) {
-  if (this.position.width === val) return
-  if (/^\d+$/.test(val)) val = +val
-  this.emit('resize')
-  this.clearPos()
-  return this.position.width = val
-})
-
-Element.prototype.__defineSetter__('height', function (val) {
-  if (this.position.height === val) return
-  if (/^\d+$/.test(val)) val = +val
-  this.emit('resize')
-  this.clearPos()
-  return this.position.height = val
-})
-
-Element.prototype.__defineSetter__('aleft', function (val) {
-  let expr
-  if (typeof val === 'string') {
-    if (val === 'center') {
-      val = this.screen.width / 2 | 0
-      val -= this.width / 2 | 0
-    } else {
-      expr = val.split(/(?=\+|-)/)
-      val = expr[0]
-      val = +val.slice(0, -1) / 100
-      val = this.screen.width * val | 0
-      val += +(expr[1] || 0)
-    }
-  }
-  val -= this.parent.aleft
-  if (this.position.left === val) return
-  this.emit('move')
-  this.clearPos()
-  return this.position.left = val
-})
-
-Element.prototype.__defineSetter__('aright', function (val) {
-  val -= this.parent.aright
-  if (this.position.right === val) return
-  this.emit('move')
-  this.clearPos()
-  return this.position.right = val
-})
-
-Element.prototype.__defineSetter__('atop', function (val) {
-  let expr
-  if (typeof val === 'string') {
-    if (val === 'center') {
-      val = this.screen.height / 2 | 0
-      val -= this.height / 2 | 0
-    } else {
-      expr = val.split(/(?=\+|-)/)
-      val = expr[0]
-      val = +val.slice(0, -1) / 100
-      val = this.screen.height * val | 0
-      val += +(expr[1] || 0)
-    }
-  }
-  val -= this.parent.atop
-  if (this.position.top === val) return
-  this.emit('move')
-  this.clearPos()
-  return this.position.top = val
-})
-
-Element.prototype.__defineSetter__('abottom', function (val) {
-  val -= this.parent.abottom
-  if (this.position.bottom === val) return
-  this.emit('move')
-  this.clearPos()
-  return this.position.bottom = val
-})
-
-Element.prototype.__defineSetter__('rleft', function (val) {
-  if (this.position.left === val) return
-  if (/^\d+$/.test(val)) val = +val
-  this.emit('move')
-  this.clearPos()
-  return this.position.left = val
-})
-
-Element.prototype.__defineSetter__('rright', function (val) {
-  if (this.position.right === val) return
-  this.emit('move')
-  this.clearPos()
-  return this.position.right = val
-})
-
-Element.prototype.__defineSetter__('rtop', function (val) {
-  if (this.position.top === val) return
-  if (/^\d+$/.test(val)) val = +val
-  this.emit('move')
-  this.clearPos()
-  return this.position.top = val
-})
-
-Element.prototype.__defineSetter__('rbottom', function (val) {
-  if (this.position.bottom === val) return
-  this.emit('move')
-  this.clearPos()
-  return this.position.bottom = val
-})
-
-Element.prototype.__defineGetter__('ileft', function () {
-  return (this.border ? 1 : 0) + this.padding.left
-  // return (this.border && this.border.left ? 1 : 0) + this.padding.left;
-})
-
-Element.prototype.__defineGetter__('itop', function () {
-  return (this.border ? 1 : 0) + this.padding.top
-  // return (this.border && this.border.top ? 1 : 0) + this.padding.top;
-})
-
-Element.prototype.__defineGetter__('iright', function () {
-  return (this.border ? 1 : 0) + this.padding.right
-  // return (this.border && this.border.right ? 1 : 0) + this.padding.right;
-})
-
-Element.prototype.__defineGetter__('ibottom', function () {
-  return (this.border ? 1 : 0) + this.padding.bottom
-  // return (this.border && this.border.bottom ? 1 : 0) + this.padding.bottom;
-})
-
-Element.prototype.__defineGetter__('iwidth', function () {
-  // return (this.border
-  //   ? ((this.border.left ? 1 : 0) + (this.border.right ? 1 : 0)) : 0)
-  //   + this.padding.left + this.padding.right;
-  return (this.border ? 2 : 0) + this.padding.left + this.padding.right
-})
-
-Element.prototype.__defineGetter__('iheight', function () {
-  // return (this.border
-  //   ? ((this.border.top ? 1 : 0) + (this.border.bottom ? 1 : 0)) : 0)
-  //   + this.padding.top + this.padding.bottom;
-  return (this.border ? 2 : 0) + this.padding.top + this.padding.bottom
-})
-
-Element.prototype.__defineGetter__('tpadding', function () {
-  return this.padding.left + this.padding.top
-    + this.padding.right + this.padding.bottom
-})
-
-/**
- * Relative coordinates as default properties
- */
-
-Element.prototype.__defineGetter__('left', function () {
-  return this.rleft
-})
-
-Element.prototype.__defineGetter__('right', function () {
-  return this.rright
-})
-
-Element.prototype.__defineGetter__('top', function () {
-  return this.rtop
-})
-
-Element.prototype.__defineGetter__('bottom', function () {
-  return this.rbottom
-})
-
-Element.prototype.__defineSetter__('left', function (val) {
-  return this.rleft = val
-})
-
-Element.prototype.__defineSetter__('right', function (val) {
-  return this.rright = val
-})
-
-Element.prototype.__defineSetter__('top', function (val) {
-  return this.rtop = val
-})
-
-Element.prototype.__defineSetter__('bottom', function (val) {
-  return this.rbottom = val
-})

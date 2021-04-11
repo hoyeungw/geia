@@ -5,24 +5,19 @@
  */
 
 import { EventEmitter } from '@geia/tui-events'
+import { Screen }       from './screen'
 
 export class Node extends EventEmitter {
   type = 'node'
   /**
    * Node
    */
-  constructor(options) {
-    super()
+  constructor(options = {}) {
+    super(options)
     const self = this
-    const Screen = require('./screen')
-
     if (!(this instanceof Node)) return new Node(options)
-
-    options = options || {}
     this.options = options
-
     this.screen = this.screen || options.screen
-
     if (!this.screen) {
       if (this.type === 'screen') {
         this.screen = this
@@ -58,15 +53,10 @@ export class Node extends EventEmitter {
     this.uid = Node.uid++
     this.index = this.index != null ? this.index : -1
 
-    if (this.type !== 'screen') {
-      this.detached = true
-    }
+    if (this.type !== 'screen') { this.detached = true }
+    if (this.parent) { this.parent.append(this) }
 
-    if (this.parent) {
-      this.parent.append(this)
-    }
-
-    (options.children || []).forEach(this.append.bind(this))
+    (options.children ?? []).forEach(this.append.bind(this))
   }
   static uid = 0
   insert(element, i) {

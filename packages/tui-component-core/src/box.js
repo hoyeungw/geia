@@ -4,7 +4,7 @@
  * https://github.com/chjj/blessed
  */
 
-import Element from './element'
+import { Element } from './element'
 
 /**
  * Modules
