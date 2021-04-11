@@ -11,9 +11,9 @@ export class EventEmitter {
   constructor() {
     if (!this._events) this._events = {}
   }
-  setMaxListeners(n) {
-    this._maxListeners = n
-  }
+  static listenerCount
+  build() { return new EventEmitter() }
+  setMaxListeners(n) { this._maxListeners = n }
   on(type, listener) { this.addListener(type, listener) }
   off(type, listener) { this.removeListener(type, listener) }
   addListener(type, listener) {

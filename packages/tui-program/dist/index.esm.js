@@ -850,9 +850,10 @@ class Program extends EventEmitter {
     // EventEmitter.call(this)
 
     if (!options || options.__proto__ !== Object.prototype) {
+      const [input, output] = arguments;
       options = {
-        input: arguments[0],
-        output: arguments[1]
+        input,
+        output
       };
     }
 
@@ -950,8 +951,7 @@ class Program extends EventEmitter {
   }
 
   debug() {
-    if (!this.options.debug) return;
-    return this._log('DEBUG', util.format.apply(util, arguments));
+    return !this.options.debug ? void 0 : this._log('DEBUG', util.format.apply(util, arguments));
   }
 
   _log(pre, msg) {
@@ -1009,9 +1009,7 @@ class Program extends EventEmitter {
       });
     }
 
-    this.input.on('data', function (data) {
-      self._log('IN', stringify(decoder.write(data)));
-    });
+    this.input.on('data', data => self._log('IN', stringify(decoder.write(data))));
 
     this.output.write = function (data) {
       self._log('OUT', stringify(data));
@@ -1052,10 +1050,7 @@ class Program extends EventEmitter {
     this.put = function () {
       const args = slice.call(arguments),
             cap = args.shift();
-
-      if (tput[cap]) {
-        return this._write(tput[cap].apply(tput, args));
-      }
+      if (tput[cap]) return this._write(tput[cap].apply(tput, args));
     };
 
     Object.keys(tput).forEach(function (key) {
@@ -1085,8 +1080,7 @@ class Program extends EventEmitter {
   }
 
   set terminal(terminal) {
-    this.setTerminal(terminal);
-    return this.terminal;
+    return this.setTerminal(terminal), this.terminal;
   }
 
   setTerminal(terminal) {
@@ -1096,7 +1090,9 @@ class Program extends EventEmitter {
   }
 
   has(name) {
-    return this.tput ? this.tput.has(name) : false;
+    var _this$tput$has, _this$tput;
+
+    return (_this$tput$has = (_this$tput = this.tput) === null || _this$tput === void 0 ? void 0 : _this$tput.has(name)) !== null && _this$tput$has !== void 0 ? _this$tput$has : false;
   }
 
   term(is) {
@@ -1458,10 +1454,7 @@ class Program extends EventEmitter {
       // NOTE: This may be different than 128/129 depending
       // on mod keys.
 
-      if (b === 128 || b === 129) {
-        b = 67;
-      }
-
+      if (b === 128 || b === 129) b = 67;
       b -= 32;
 
       if (b >> 6 & 1) {
@@ -1719,9 +1712,7 @@ class Program extends EventEmitter {
 
 
     if (parts = /^\x1b\[(\?|>)(\d*(?:;\d*)*)c/.exec(s)) {
-      parts = parts[2].split(';').map(function (ch) {
-        return +ch || 0;
-      });
+      parts = parts[2].split(';').map(ch => +ch || 0);
       out.event = 'device-attributes';
       out.code = 'DA';
 
@@ -2135,9 +2126,7 @@ class Program extends EventEmitter {
 
 
     if (parts = /^\x1b\[(\d+(?:;\d+){4})&w/.exec(s)) {
-      parts = parts[1].split(';').map(function (ch) {
-        return +ch;
-      });
+      parts = parts[1].split(';').map(ch => +ch);
       out.event = 'locator-position';
       out.code = 'DECRQLP';
 
@@ -2220,10 +2209,7 @@ class Program extends EventEmitter {
       name = null;
     }
 
-    if (!callback) {
-      callback = function () {};
-    }
-
+    if (!callback) callback = () => {};
     this.bindResponse();
     name = name ? 'response ' + name : 'response';
     let onresponse;
@@ -2236,7 +2222,7 @@ class Program extends EventEmitter {
 
       return callback(null, event);
     });
-    var timeout = setTimeout(function () {
+    const timeout = setTimeout(function () {
       self.removeListener(name, onresponse);
       return callback(new Error('Timeout.'));
     }, 2000);
@@ -2244,8 +2230,7 @@ class Program extends EventEmitter {
   }
 
   write(text) {
-    if (!this.output.writable) return;
-    return this.output.write(text);
+    return !this.output.writable ? void 0 : this.output.write(text);
   }
 
   _buffer(text) {
@@ -2331,8 +2316,9 @@ class Program extends EventEmitter {
   }
 
   setx(x) {
-    return this.cursorCharAbsolute(x); // return this.charPosAbsolute(x);
-  }
+    return this.cursorCharAbsolute(x);
+  } // return this.charPosAbsolute(x)
+
 
   sety(y) {
     return this.linePosAbsolute(y);
@@ -2387,8 +2373,7 @@ class Program extends EventEmitter {
   }
 
   rmove(x, y) {
-    this.rsetx(x);
-    this.rsety(y);
+    this.rsetx(x), this.rsety(y);
   }
 
   simpleInsert(ch, i, attr) {
@@ -2405,8 +2390,7 @@ class Program extends EventEmitter {
   }
 
   set title(title) {
-    this.setTitle(title);
-    return this._title;
+    return this.setTitle(title), this._title;
   } // Specific to iTerm2, but I think it's really cool.
   // Example:
   //  if (!screen.copyToClipboard(text)) {
@@ -2416,9 +2400,7 @@ class Program extends EventEmitter {
 
   copyToClipboard(text) {
     if (this.isiTerm2) {
-      this._twrite('\x1b]50;CopyToCliboard=' + text + '\x07');
-
-      return true;
+      return this._twrite('\x1b]50;CopyToCliboard=' + text + '\x07'), true;
     }
 
     return false;

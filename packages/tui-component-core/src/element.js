@@ -8,15 +8,16 @@
  * Modules
  */
 import assert  from 'assert'
-import colors  from '../tools/colors'
-import helpers from '../tools/helpers'
-import unicode from '../tools/unicode'
+import * as colors  from '@geia/tui-colors'
+import * as helpers from '@geia/tui-helpers'
+import * as unicode from '@geia/tui-unicode'
 
 import Node from './node'
 
 const nextTick = global.setImmediate || process.nextTick.bind(process)
 
-class Element extends Node {
+export class Element extends Node {
+  type = 'element'
   /**
    * Element
    */
@@ -212,10 +213,7 @@ class Element extends Node {
       this.draggable = true
     }
 
-    if (options.focused) {
-      this.focus()
-    }
-    this.type = 'element'
+    if (options.focused) this.focus()
     this._render = Element.prototype.render
   }
   sattr(style, fg, bg) {
@@ -2227,7 +2225,6 @@ class Element extends Node {
   }
 }
 
-
 Element.prototype.__defineGetter__('focused', function () {
   return this.screen.focused === this
 })
@@ -2491,8 +2488,3 @@ Element.prototype.__defineSetter__('top', function (val) {
 Element.prototype.__defineSetter__('bottom', function (val) {
   return this.rbottom = val
 })
-
-/**
- * Expose
- */
-export default Element

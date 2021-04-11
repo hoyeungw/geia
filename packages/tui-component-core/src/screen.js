@@ -8,11 +8,11 @@
  * Modules
  */
 import { Program } from '@geia/tui-program'
-import Node        from './node'
+import { Node }    from './node'
 
 const nextTick = global.setImmediate || process.nextTick.bind(process)
 
-class Screen extends Node {
+export class Screen extends Node {
   constructor(options) {
     super(options)
     const self = this
@@ -311,8 +311,3 @@ Object.keys(angleTable).forEach(function (key) {
   angleTable[parseInt(key, 2)] = angleTable[key]
   delete angleTable[key]
 })
-
-/**
- * Expose
- */
-export default Screen

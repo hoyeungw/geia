@@ -10,7 +10,7 @@ import Element from './element'
  * Modules
  */
 
-class Box extends Element {
+export class Box extends Element {
   type = 'box'
   /**
    * Box
@@ -20,9 +20,3 @@ class Box extends Element {
   }
   static build(options) { return new Box(options) }
 }
-
-
-/**
- * Expose
- */
-export default Box

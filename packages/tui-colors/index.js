@@ -13,9 +13,7 @@ export function match(r1, g1, b1) {
     b1 = r1[2], g1 = r1[1], r1 = r1[0]
   }
   const hash = (r1 << 16) | (g1 << 8) | b1
-  if (_cache[hash] != null) {
-    return _cache[hash]
-  }
+  if (_cache[hash] != null) return _cache[hash]
   let
     ldiff = Infinity,
     li = -1,

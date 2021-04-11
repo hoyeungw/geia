@@ -7,9 +7,10 @@
 /**
  * Modules
  */
-import { EventEmitter } from '../tools/events'
+import { EventEmitter } from '@geia/tui-events'
 
-class Node extends EventEmitter{
+export class Node extends EventEmitter {
+  type = 'node'
   /**
    * Node
    */
@@ -19,8 +20,6 @@ class Node extends EventEmitter{
     const Screen = require('./screen')
 
     if (!(this instanceof Node)) return new Node(options)
-
-    EventEmitter.call(this)
 
     options = options || {}
     this.options = options
@@ -71,8 +70,8 @@ class Node extends EventEmitter{
     }
 
     (options.children || []).forEach(this.append.bind(this))
-    this.type = 'node';
   }
+  static uid = 0
   insert(element, i) {
     const self = this
 
@@ -250,11 +249,4 @@ class Node extends EventEmitter{
   }
 }
 
-Node.uid = 0
-
 // Node.prototype.__proto__ = EventEmitter.prototype
-
-/**
- * Expose
- */
-export default Node

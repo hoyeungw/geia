@@ -13,7 +13,8 @@ import ScrollableText from './scrollabletext'
 
 const nextTick = global.setImmediate || process.nextTick.bind(process)
 
-class Log extends ScrollableText {
+export class Log extends ScrollableText {
+  type='log'
   /**
    * Log
    */
@@ -36,7 +37,6 @@ class Log extends ScrollableText {
         })
       }
     })
-    this.type = 'log'
     this._scroll = Log.prototype.scroll
   }
   log() {
@@ -75,9 +75,3 @@ class Log extends ScrollableText {
     return ret
   }
 }
-
-
-/**
- * Expose
- */
-export default Log

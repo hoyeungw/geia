@@ -7,10 +7,10 @@
 /**
  * Modules
  */
-import Node          from './node'
-import ScrollableBox from './scrollablebox'
+import { Node }          from './node'
+import { ScrollableBox } from './scrollablebox'
 
-class ScrollableText extends ScrollableBox {
+export class ScrollableText extends ScrollableBox {
   type = 'scrollable-text'
   /**
    * ScrollableText
@@ -21,9 +21,3 @@ class ScrollableText extends ScrollableBox {
     if (!(this instanceof Node)) return new ScrollableText(options)
   }
 }
-
-
-/**
- * Expose
- */
-export default ScrollableText

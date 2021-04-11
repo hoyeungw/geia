@@ -4,13 +4,11 @@
  * https://github.com/chjj/blessed
  */
 
-import Box  from './box'
-/**
- * Modules
- */
-import Node from './node'
+import { Box }  from './box'
+import { Node } from './node'
 
-class ScrollableBox extends Box {
+export class ScrollableBox extends Box {
+  type = 'scrollable-box'
   /**
    * ScrollableBox
    */
@@ -157,7 +155,7 @@ class ScrollableBox extends Box {
     })
 
     self._recalculateIndex()
-    this.type = 'scrollable-box'
+
   }
   _scrollBottom() {
     if (!this.scrollable) return 0
@@ -367,8 +365,3 @@ ScrollableBox.prototype.__defineGetter__('reallyScrollable', function () {
   if (this.shrink) return this.scrollable
   return this.getScrollHeight() > this.height
 })
-
-/**
- * Expose
- */
-export default ScrollableBox

@@ -11,6 +11,10 @@ class EventEmitter {
     if (!this._events) this._events = {};
   }
 
+  build() {
+    return new EventEmitter();
+  }
+
   setMaxListeners(n) {
     this._maxListeners = n;
   }

@@ -37,10 +37,8 @@ export class Program extends EventEmitter {
     // EventEmitter.call(this)
 
     if (!options || options.__proto__ !== Object.prototype) {
-      options = {
-        input: arguments[0],
-        output: arguments[1]
-      }
+      const [ input, output ] = arguments
+      options = { input, output }
     }
 
     this.options = options
@@ -122,16 +120,13 @@ export class Program extends EventEmitter {
   static instances = []
   static bind(program) {
     if (!Program.global) Program.global = program
-
     if (!~Program.instances.indexOf(program)) {
       Program.instances.push(program)
       program.index = Program.total
       Program.total++
     }
-
     if (Program._bound) return
     Program._bound = true
-
     unshiftEvent(process, 'exit', Program._exitHandler = function () {
       Program.instances.forEach(function (program) {
         // Potentially reset window title on exit:
@@ -147,13 +142,12 @@ export class Program extends EventEmitter {
       })
     })
   }
-  log() {
-    return this._log('LOG', util.format.apply(util, arguments))
-  }
+  log() { return this._log('LOG', util.format.apply(util, arguments)) }
 
   debug() {
-    if (!this.options.debug) return
-    return this._log('DEBUG', util.format.apply(util, arguments))
+    return !this.options.debug
+      ? void 0
+      : this._log('DEBUG', util.format.apply(util, arguments))
   }
 
   _log(pre, msg) {
@@ -165,7 +159,6 @@ export class Program extends EventEmitter {
     const self = this,
       write = this.output.write,
       decoder = new StringDecoder('utf8')
-
     function stringify(data) {
       return caret(data
         .replace(/\r/g, '\\r')
@@ -211,11 +204,7 @@ export class Program extends EventEmitter {
         return '^' + ch
       })
     }
-
-    this.input.on('data', function (data) {
-      self._log('IN', stringify(decoder.write(data)))
-    })
-
+    this.input.on('data', data => self._log('IN', stringify(decoder.write(data))))
     this.output.write = function (data) {
       self._log('OUT', stringify(data))
       return write.apply(this, arguments)
@@ -225,11 +214,10 @@ export class Program extends EventEmitter {
   setupTput() {
     if (this._tputSetup) return
     this._tputSetup = true
-
-    const self = this,
+    const
+      self = this,
       options = this.options,
       write = this._write.bind(this)
-
     const tput = this.tput = new Tput({
       terminal: this.terminal,
       padding: options.padding,
@@ -238,58 +226,43 @@ export class Program extends EventEmitter {
       termcap: options.termcap,
       forceUnicode: options.forceUnicode
     })
-
     if (tput.error) {
       nextTick(function () {
         self.emit('warning', tput.error.message)
       })
     }
-
     if (tput.padding) {
       nextTick(function () {
         self.emit('warning', 'Terminfo padding has been enabled.')
       })
     }
-
     this.put = function () {
-      const args = slice.call(arguments),
+      const
+        args = slice.call(arguments),
         cap = args.shift()
-
-      if (tput[cap]) {
+      if (tput[cap])
         return this._write(tput[cap].apply(tput, args))
-      }
     }
 
     Object.keys(tput).forEach(function (key) {
       if (self[key] == null) {
         self[key] = tput[key]
       }
-
       if (typeof tput[key] !== 'function') {
         self.put[key] = tput[key]
         return
       }
-
       if (tput.padding) {
-        self.put[key] = function () {
-          return tput._print(tput[key].apply(tput, arguments), write)
-        }
+        self.put[key] = function () { return tput._print(tput[key].apply(tput, arguments), write) }
       } else {
-        self.put[key] = function () {
-          return self._write(tput[key].apply(tput, arguments))
-        }
+        self.put[key] = function () { return self._write(tput[key].apply(tput, arguments)) }
       }
     })
   }
 
-  get terminal() {
-    return this._terminal
-  }
+  get terminal() { return this._terminal }
 
-  set terminal(terminal) {
-    this.setTerminal(terminal)
-    return this.terminal
-  }
+  set terminal(terminal) { return this.setTerminal(terminal), this.terminal }
 
   setTerminal(terminal) {
     this._terminal = terminal.toLowerCase()
@@ -297,15 +270,9 @@ export class Program extends EventEmitter {
     this.setupTput()
   }
 
-  has(name) {
-    return this.tput
-      ? this.tput.has(name)
-      : false
-  }
+  has(name) { return this.tput?.has(name) ?? false }
 
-  term(is) {
-    return this.terminal.indexOf(is) === 0
-  }
+  term(is) { return this.terminal.indexOf(is) === 0 }
 
   listen() {
     const self = this
@@ -355,63 +322,51 @@ export class Program extends EventEmitter {
 
   _listenInput() {
     const self = this
-
     // Input
     this.input.on('keypress', this.input._keypressHandler = function (ch, key) {
       key = key || { ch: ch }
-
       if (key.name === 'undefined'
         && (key.code === '[M' || key.code === '[I' || key.code === '[O')) {
         // A mouse sequence. The `keys` module doesn't understand these.
         return
       }
-
       if (key.name === 'undefined') {
         // Not sure what this is, but we should probably ignore it.
         return
       }
-
       if (key.name === 'enter' && key.sequence === '\n') {
         key.name = 'linefeed'
       }
-
       if (key.name === 'return' && key.sequence === '\r') {
         self.input.emit('keypress', ch, merge({}, key, { name: 'enter' }))
       }
-
       const name = (key.ctrl ? 'C-' : '')
         + (key.meta ? 'M-' : '')
         + (key.shift && key.name ? 'S-' : '')
         + (key.name || ch)
-
       key.full = name
-
       Program.instances.forEach(function (program) {
         if (program.input !== self.input) return
         program.emit('keypress', ch, key)
         program.emit('key ' + name, ch, key)
       })
     })
-
     this.input.on('data', this.input._dataHandler = function (data) {
       Program.instances.forEach(function (program) {
         if (program.input !== self.input) return
         program.emit('data', data)
       })
     })
-
     keys.emitKeypressEvents(this.input)
   }
 
   _listenOutput() {
     const self = this
-
     if (!this.output.isTTY) {
       nextTick(function () {
         self.emit('warning', 'Output is not a TTY')
       })
     }
-
     // Output
     function resize() {
       Program.instances.forEach(function (program) {
@@ -421,7 +376,6 @@ export class Program extends EventEmitter {
         program.emit('resize')
       })
     }
-
     this.output.on('resize', this.output._resizeHandler = function () {
       Program.instances.forEach(function (program) {
         if (program.output !== self.output) return
@@ -442,41 +396,28 @@ export class Program extends EventEmitter {
 
   destroy() {
     const index = Program.instances.indexOf(this)
-
     if (~index) {
       Program.instances.splice(index, 1)
       Program.total--
-
       this.flush()
       this._exiting = true
-
       Program.global = Program.instances[0]
-
       if (Program.total === 0) {
         Program.global = null
-
         process.removeListener('exit', Program._exitHandler)
         delete Program._exitHandler
-
         delete Program._bound
       }
-
       this.input._blessedInput--
       this.output._blessedOutput--
-
       if (this.input._blessedInput === 0) {
         this.input.removeListener('keypress', this.input._keypressHandler)
         this.input.removeListener('data', this.input._dataHandler)
         delete this.input._keypressHandler
         delete this.input._dataHandler
-
         if (this.input.setRawMode) {
-          if (this.input.isRaw) {
-            this.input.setRawMode(false)
-          }
-          if (!this.input.destroyed) {
-            this.input.pause()
-          }
+          if (this.input.isRaw) { this.input.setRawMode(false) }
+          if (!this.input.destroyed) { this.input.pause() }
         }
       }
 
@@ -550,7 +491,8 @@ export class Program extends EventEmitter {
 
   _bindMouse(s, buf) {
     const self = this
-    let key,
+    let
+      key,
       parts,
       b,
       x,
@@ -560,7 +502,6 @@ export class Program extends EventEmitter {
       down,
       page,
       button
-
     key = {
       name: undefined,
       ctrl: false,
@@ -575,7 +516,6 @@ export class Program extends EventEmitter {
         s = s.toString('utf-8')
       }
     }
-
     // if (this.8bit) {
     //   s = s.replace(/\233/g, '\x1b[');
     //   buf = new Buffer(s, 'utf8');
@@ -595,13 +535,17 @@ export class Program extends EventEmitter {
     // technically.
     const bx = s.charCodeAt(4)
     const by = s.charCodeAt(5)
-    if (buf[0] === 0x1b && buf[1] === 0x5b && buf[2] === 0x4d
-      && (this.isVTE
+    if (
+      buf[0] === 0x1b && buf[1] === 0x5b && buf[2] === 0x4d
+      && (
+        this.isVTE
         || bx >= 65533 || by >= 65533
         || (bx > 0x00 && bx < 0x20)
         || (by > 0x00 && by < 0x20)
         || (buf[4] > 223 && buf[4] < 248 && buf.length === 6)
-        || (buf[5] > 223 && buf[5] < 248 && buf.length === 6))) {
+        || (buf[5] > 223 && buf[5] < 248 && buf.length === 6)
+      )
+    ) {
       b = buf[3]
       x = buf[4]
       y = buf[5]
@@ -657,10 +601,10 @@ export class Program extends EventEmitter {
         key.action = 'mousedown'
         button = b & 3
         key.button =
-          button === 0 ? 'left'
-            : button === 1 ? 'middle'
-            : button === 2 ? 'right'
-              : 'unknown'
+          button === 0 ? 'left' :
+            button === 1 ? 'middle' :
+              button === 2 ? 'right' :
+                'unknown'
         this._lastButton = key.button
       }
 
@@ -674,19 +618,19 @@ export class Program extends EventEmitter {
       // xterm: 35, _, 51, _
       // urxvt: 35, _, _, _
       // if (key.action === 'mousedown' && key.button === 'unknown') {
-      if (b === 35 || b === 39 || b === 51 || b === 43
-        || (this.isVTE && (b === 32 || b === 36 || b === 48 || b === 40))) {
+      if (
+        b === 35 || b === 39 || b === 51 || b === 43
+        || (this.isVTE && (b === 32 || b === 36 || b === 48 || b === 40))
+      ) {
         delete key.button
         key.action = 'mousemove'
       }
-
       self.emit('mouse', key)
-
       return
     }
 
     // URxvt
-    if (parts = /^\x1b\[(\d+;\d+;\d+)M/.exec(s)) {
+    if ((parts = /^\x1b\[(\d+;\d+;\d+)M/.exec(s))) {
       params = parts[1].split(';')
       b = +params[0]
       x = +params[1]
@@ -710,12 +654,8 @@ export class Program extends EventEmitter {
       // XXX Bug in urxvt after wheelup/down on mousemove
       // NOTE: This may be different than 128/129 depending
       // on mod keys.
-      if (b === 128 || b === 129) {
-        b = 67
-      }
-
+      if (b === 128 || b === 129) b = 67
       b -= 32
-
       if ((b >> 6) & 1) {
         key.action = b & 1 ? 'wheeldown' : 'wheelup'
         key.button = 'middle'
@@ -737,7 +677,6 @@ export class Program extends EventEmitter {
         // if ((b >> 1) === 32)
         this._lastButton = key.button
       }
-
       // Probably a movement.
       // The *newer* VTE gets mouse movements comepletely wrong.
       // This presents a problem: older versions of VTE that get it right might
@@ -752,12 +691,9 @@ export class Program extends EventEmitter {
         delete key.button
         key.action = 'mousemove'
       }
-
       self.emit('mouse', key)
-
       return
     }
-
     // SGR
     if (parts = /^\x1b\[<(\d+;\d+;\d+)([mM])/.exec(s)) {
       down = parts[2] === 'M'
@@ -853,7 +789,7 @@ export class Program extends EventEmitter {
     }
 
     // vt300
-    if (parts = /^\x1b\[24([0135])~\[(\d+),(\d+)\]\r/.exec(s)) {
+    if ((parts = /^\x1b\[24([0135])~\[(\d+),(\d+)\]\r/.exec(s))) {
       b = +parts[1]
       x = +parts[2]
       y = +parts[3]
@@ -877,7 +813,7 @@ export class Program extends EventEmitter {
       self.emit('mouse', key)
       return
     }
-    if (parts = /^\x1b\[(O|I)/.exec(s)) {
+    if ((parts = /^\x1b\[(O|I)/.exec(s))) {
       key.action = parts[1] === 'I'
         ? 'focus'
         : 'blur'
@@ -912,7 +848,6 @@ export class Program extends EventEmitter {
 
     this.gpm.on('btnup', function (btn, modifier, x, y) {
       x--, y--
-
       const key = {
         name: 'mouse',
         type: 'GPM',
@@ -925,13 +860,11 @@ export class Program extends EventEmitter {
         meta: self.gpm.hasMetaKey(modifier),
         ctrl: self.gpm.hasCtrlKey(modifier)
       }
-
       self.emit('mouse', key)
     })
 
     this.gpm.on('move', function (btn, modifier, x, y) {
       x--, y--
-
       const key = {
         name: 'mouse',
         type: 'GPM',
@@ -944,13 +877,11 @@ export class Program extends EventEmitter {
         meta: self.gpm.hasMetaKey(modifier),
         ctrl: self.gpm.hasCtrlKey(modifier)
       }
-
       self.emit('mouse', key)
     })
 
     this.gpm.on('drag', function (btn, modifier, x, y) {
       x--, y--
-
       const key = {
         name: 'mouse',
         type: 'GPM',
@@ -963,7 +894,6 @@ export class Program extends EventEmitter {
         meta: self.gpm.hasMetaKey(modifier),
         ctrl: self.gpm.hasCtrlKey(modifier)
       }
-
       self.emit('mouse', key)
     })
 
@@ -980,7 +910,6 @@ export class Program extends EventEmitter {
         meta: self.gpm.hasMetaKey(modifier),
         ctrl: self.gpm.hasCtrlKey(modifier)
       }
-
       self.emit('mouse', key)
     })
   }
@@ -996,10 +925,8 @@ export class Program extends EventEmitter {
   bindResponse() {
     if (this._boundResponse) return
     this._boundResponse = true
-
     const decoder = new StringDecoder('utf8'),
       self = this
-
     this.on('data', function (data) {
       data = decoder.write(data)
       if (!data) return
@@ -1010,7 +937,6 @@ export class Program extends EventEmitter {
   _bindResponse(s) {
     const out = {}
     let parts
-
     if (Buffer.isBuffer(s)) {
       if (s[0] > 127 && s[1] === undefined) {
         s[0] -= 128
@@ -1025,9 +951,7 @@ export class Program extends EventEmitter {
     // CSI > P s c
     // Send Device Attributes (Secondary DA).
     if (parts = /^\x1b\[(\?|>)(\d*(?:;\d*)*)c/.exec(s)) {
-      parts = parts[2].split(';').map(function (ch) {
-        return +ch || 0
-      })
+      parts = parts[2].split(';').map(ch => +ch || 0)
 
       out.event = 'device-attributes'
       out.code = 'DA'
@@ -1150,47 +1074,35 @@ export class Program extends EventEmitter {
     if (parts = /^\x1b\[(\?)?(\d+)(?:;(\d+);(\d+);(\d+))?n/.exec(s)) {
       out.event = 'device-status'
       out.code = 'DSR'
-
       if (!parts[1] && parts[2] === '0' && !parts[3]) {
         out.type = 'device-status'
         out.status = 'OK'
-
         // LEGACY
         out.deviceStatus = out.status
-
         this.emit('response', out)
         this.emit('response ' + out.event, out)
-
         return
       }
-
       if (parts[1] && (parts[2] === '10' || parts[2] === '11') && !parts[3]) {
         out.type = 'printer-status'
         out.status = parts[2] === '10'
           ? 'ready'
           : 'not ready'
-
         // LEGACY
         out.printerStatus = out.status
-
         this.emit('response', out)
         this.emit('response ' + out.event, out)
-
         return
       }
-
       if (parts[1] && (parts[2] === '20' || parts[2] === '21') && !parts[3]) {
         out.type = 'udk-status'
         out.status = parts[2] === '20'
           ? 'unlocked'
           : 'locked'
-
         // LEGACY
         out.UDKStatus = out.status
-
         this.emit('response', out)
         this.emit('response ' + out.event, out)
-
         return
       }
 
@@ -1201,13 +1113,10 @@ export class Program extends EventEmitter {
         && parts[5] === '0') {
         out.type = 'keyboard-status'
         out.status = 'OK'
-
         // LEGACY
         out.keyboardStatus = out.status
-
         this.emit('response', out)
         this.emit('response ' + out.event, out)
-
         return
       }
 
@@ -1216,28 +1125,20 @@ export class Program extends EventEmitter {
         out.status = parts[2] === '53'
           ? 'available'
           : 'unavailable'
-
         // LEGACY
         out.locator = out.status
-
         this.emit('response', out)
         this.emit('response ' + out.event, out)
-
         return
       }
-
       out.type = 'error'
       out.text = 'Unhandled: ' + JSON.stringify(parts)
-
       // LEGACY
       out.error = out.text
-
       this.emit('response', out)
       this.emit('response ' + out.event, out)
-
       return
     }
-
     // CSI Ps n  Device Status Report (DSR).
     //     Ps = 6  -> Report Cursor Position (CPR) [row;column].
     //   Result is
@@ -1250,26 +1151,20 @@ export class Program extends EventEmitter {
       out.event = 'device-status'
       out.code = 'DSR'
       out.type = 'cursor-status'
-
       out.status = {
         x: +parts[3],
         y: +parts[2],
         page: !parts[1] ? undefined : 0
       }
-
       out.x = out.status.x
       out.y = out.status.y
       out.page = out.status.page
-
       // LEGACY
       out.cursor = out.status
-
       this.emit('response', out)
       this.emit('response ' + out.event, out)
-
       return
     }
-
     // CSI Ps ; Ps ; Ps t
     //   Window manipulation (from dtterm, as well as extensions).
     //   These controls may be disabled using the allowWindowOps
@@ -1289,38 +1184,29 @@ export class Program extends EventEmitter {
     if (parts = /^\x1b\[(\d+)(?:;(\d+);(\d+))?t/.exec(s)) {
       out.event = 'window-manipulation'
       out.code = ''
-
       if ((parts[1] === '1' || parts[1] === '2') && !parts[2]) {
         out.type = 'window-state'
         out.state = parts[1] === '1'
           ? 'non-iconified'
           : 'iconified'
-
         // LEGACY
         out.windowState = out.state
-
         this.emit('response', out)
         this.emit('response ' + out.event, out)
-
         return
       }
-
       if (parts[1] === '3' && parts[2]) {
         out.type = 'window-position'
-
         out.position = {
           x: +parts[2],
           y: +parts[3]
         }
         out.x = out.position.x
         out.y = out.position.y
-
         // LEGACY
         out.windowPosition = out.position
-
         this.emit('response', out)
         this.emit('response ' + out.event, out)
-
         return
       }
 
@@ -1332,13 +1218,10 @@ export class Program extends EventEmitter {
         }
         out.height = out.size.height
         out.width = out.size.width
-
         // LEGACY
         out.windowSizePixels = out.size
-
         this.emit('response', out)
         this.emit('response ' + out.event, out)
-
         return
       }
 
@@ -1350,13 +1233,10 @@ export class Program extends EventEmitter {
         }
         out.height = out.size.height
         out.width = out.size.width
-
         // LEGACY
         out.textAreaSizeCharacters = out.size
-
         this.emit('response', out)
         this.emit('response ' + out.event, out)
-
         return
       }
 
@@ -1368,25 +1248,19 @@ export class Program extends EventEmitter {
         }
         out.height = out.size.height
         out.width = out.size.width
-
         // LEGACY
         out.screenSizeCharacters = out.size
-
         this.emit('response', out)
         this.emit('response ' + out.event, out)
-
         return
       }
 
       out.type = 'error'
       out.text = 'Unhandled: ' + JSON.stringify(parts)
-
       // LEGACY
       out.error = out.text
-
       this.emit('response', out)
       this.emit('response ' + out.event, out)
-
       return
     }
 
@@ -1417,42 +1291,32 @@ export class Program extends EventEmitter {
     if (parts = /^\x1b\](l|L)([^\x07\x1b]*)(?:\x07|\x1b\\)/.exec(s)) {
       out.event = 'window-manipulation'
       out.code = ''
-
       if (parts[1] === 'L') {
         out.type = 'window-icon-label'
         out.text = parts[2]
-
         // LEGACY
         out.windowIconLabel = out.text
-
         this.emit('response', out)
         this.emit('response ' + out.event, out)
-
         return
       }
 
       if (parts[1] === 'l') {
         out.type = 'window-title'
         out.text = parts[2]
-
         // LEGACY
         out.windowTitle = out.text
-
         this.emit('response', out)
         this.emit('response ' + out.event, out)
-
         return
       }
 
       out.type = 'error'
       out.text = 'Unhandled: ' + JSON.stringify(parts)
-
       // LEGACY
       out.error = out.text
-
       this.emit('response', out)
       this.emit('response ' + out.event, out)
-
       return
     }
 
@@ -1490,13 +1354,9 @@ export class Program extends EventEmitter {
     // The xterm mouse documentation says there is a
     // `<` prefix, the DECRQLP says there is no prefix.
     if (parts = /^\x1b\[(\d+(?:;\d+){4})&w/.exec(s)) {
-      parts = parts[1].split(';').map(function (ch) {
-        return +ch
-      })
-
+      parts = parts[1].split(';').map(ch => +ch)
       out.event = 'locator-position'
       out.code = 'DECRQLP'
-
       switch (parts[0]) {
         case 0:
           out.status = 'locator-unavailable'
@@ -1532,25 +1392,20 @@ export class Program extends EventEmitter {
           out.status = 'locator-outside'
           break
       }
-
       out.mask = parts[1]
       out.row = parts[2]
       out.col = parts[3]
       out.page = parts[4]
-
       // LEGACY
       out.locatorPosition = out
-
       this.emit('response', out)
       this.emit('response ' + out.event, out)
-
       return
     }
-
     // OSC Ps ; Pt BEL
     // OSC Ps ; Pt ST
     // Set Text Parameters
-    if (parts = /^\x1b\](\d+);([^\x07\x1b]+)(?:\x07|\x1b\\)/.exec(s)) {
+    if ((parts = /^\x1b\](\d+);([^\x07\x1b]+)(?:\x07|\x1b\\)/.exec(s))) {
       out.event = 'text-params'
       out.code = 'Set Text Parameters'
       out.ps = +s[1]
@@ -1562,25 +1417,17 @@ export class Program extends EventEmitter {
 
   response(name, text, callback, noBypass) {
     const self = this
-
     if (arguments.length === 2) {
       callback = text
       text = name
       name = null
     }
-
-    if (!callback) {
-      callback = function () {}
-    }
-
+    if (!callback) callback = () => {}
     this.bindResponse()
-
     name = name
       ? 'response ' + name
       : 'response'
-
     let onresponse
-
     this.once(name, onresponse = function (event) {
       if (timeout) clearTimeout(timeout)
       if (event.type === 'error') {
@@ -1588,21 +1435,19 @@ export class Program extends EventEmitter {
       }
       return callback(null, event)
     })
-
-    var timeout = setTimeout(function () {
+    const timeout = setTimeout(function () {
       self.removeListener(name, onresponse)
       return callback(new Error('Timeout.'))
     }, 2000)
-
     return noBypass
       ? this._write(text)
       : this._twrite(text)
   }
-
   _owrite = this.write
   write(text) {
-    if (!this.output.writable) return
-    return this.output.write(text)
+    return !this.output.writable
+      ? void 0
+      : this.output.write(text)
   }
 
   _buffer(text) {
@@ -1611,25 +1456,19 @@ export class Program extends EventEmitter {
       this._owrite(text)
       return
     }
-
     if (this._buf) {
       this._buf += text
       return
     }
-
     this._buf = text
-
     nextTick(this._flush)
-
     return true
   }
-
   flush() {
     if (!this._buf) return
     this._owrite(this._buf)
     this._buf = ''
   }
-
   _write(text) {
     if (this.ret) return text
     if (this.useBuffer) {
@@ -1664,18 +1503,14 @@ export class Program extends EventEmitter {
         }, 100)
         return true
       }
-
       // NOTE: Flushing the buffer is required in some cases.
       // The DCS code must be at the start of the output.
       this.flush()
-
       // Write out raw now that the buffer is flushed.
       return this._owrite(data)
     }
-
     return this._write(data)
   }
-
   echo = this.print
   print(text, attr) {
     return attr
@@ -1690,18 +1525,11 @@ export class Program extends EventEmitter {
     else if (this.y >= this.rows) this.y = this.rows - 1
   }
 
-  setx(x) {
-    return this.cursorCharAbsolute(x)
-    // return this.charPosAbsolute(x);
-  }
+  setx(x) { return this.cursorCharAbsolute(x) } // return this.charPosAbsolute(x)
 
-  sety(y) {
-    return this.linePosAbsolute(y)
-  }
+  sety(y) { return this.linePosAbsolute(y) }
 
-  move(x, y) {
-    return this.cursorPos(y, x)
-  }
+  move(x, y) { return this.cursorPos(y, x) }
 
 // TODO: Fix cud and cuu calls.
   omove(x, y) {
@@ -1733,44 +1561,32 @@ export class Program extends EventEmitter {
     }
   }
 
-  rsetx(x) {
-    // return this.HPositionRelative(x);
+  rsetx(x) { // return this.HPositionRelative(x);
     if (!x) return
     return x > 0
       ? this.forward(x)
       : this.back(-x)
   }
 
-  rsety(y) {
-    // return this.VPositionRelative(y);
+  rsety(y) { // return this.VPositionRelative(y);
     if (!y) return
     return y > 0
       ? this.up(y)
       : this.down(-y)
   }
 
-  rmove(x, y) {
-    this.rsetx(x)
-    this.rsety(y)
-  }
+  rmove(x, y) { this.rsetx(x), this.rsety(y) }
 
-  simpleInsert(ch, i, attr) {
-    return this._write(this.repeat(ch, i), attr)
-  }
+  simpleInsert(ch, i, attr) { return this._write(this.repeat(ch, i), attr) }
 
   repeat(ch, i) {
     if (!i || i < 0) i = 0
     return Array(i + 1).join(ch)
   }
 
-  get title() {
-    return this._title
-  }
+  get title() { return this._title }
 
-  set title(title) {
-    this.setTitle(title)
-    return this._title
-  }
+  set title(title) { return this.setTitle(title), this._title }
 
 // Specific to iTerm2, but I think it's really cool.
 // Example:
@@ -1779,8 +1595,7 @@ export class Program extends EventEmitter {
 //  }
   copyToClipboard(text) {
     if (this.isiTerm2) {
-      this._twrite('\x1b]50;CopyToCliboard=' + text + '\x07')
-      return true
+      return this._twrite('\x1b]50;CopyToCliboard=' + text + '\x07'), true
     }
     return false
   }
