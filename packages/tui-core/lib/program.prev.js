@@ -15,11 +15,12 @@ const
   fs = require('fs')
 
 const { deco } = require('@spare/deco')
-const GeiaEventEmitter = require('@geia/tui-events').EventEmitter
-
-const Tput = require('./tput'),
+const { EventEmitter: GeiaEventEmitter } = require('@geia/tui-events')
+const
+  Tput = require('./tput'),
   colors = require('./tools/colors'),
   slice = Array.prototype.slice
+const { assign } = require('@ject/mixin')
 
 const nextTick = global.setImmediate || process.nextTick.bind(process)
 
@@ -37,7 +38,8 @@ function Program(options) {
     console.log(`>>> [called with new]`)
     console.log('self:', deco(self, { depth: 1, vert: 1 }))
   }
-  EventEmitter.prototype.constructor.call(this)
+  assign(this, new GeiaEventEmitter())
+  // EventEmitter.prototype.constructor.call(this)
   Program.configSingleton(this)
   if (!options || options.__proto__ !== Object.prototype) {
     options = {
@@ -4281,4 +4283,6 @@ function merge(out) {
  * Expose
  */
 
-module.exports = Program
+exports.build = (options) => new Program(options)
+exports.Program = Program
+// module.exports = Program

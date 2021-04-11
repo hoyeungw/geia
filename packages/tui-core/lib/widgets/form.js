@@ -17,9 +17,7 @@ const Box = require('./box')
 function Form(options) {
   const self = this
 
-  if (!(this instanceof Node)) {
-    return new Form(options)
-  }
+  if (!(this instanceof Node)) return new Form(options)
 
   options = options || {}
 
@@ -58,7 +56,6 @@ function Form(options) {
 
       if (key.name === 'escape') {
         self.focus()
-
       }
     })
   }

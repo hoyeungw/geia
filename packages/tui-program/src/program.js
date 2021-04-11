@@ -156,7 +156,8 @@ export class Program extends EventEmitter {
   }
 
   setupDump() {
-    const self = this,
+    const
+      self = this,
       write = this.output.write,
       decoder = new StringDecoder('utf8')
     function stringify(data) {

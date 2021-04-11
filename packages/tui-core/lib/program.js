@@ -7,8 +7,8 @@
 /**
  * Modules
  */
-// const Program = require('./program.prev')
-const { build, Program } = require('../../tui-program/dist/index.cjs')
+const { build, Program } = require('./program.prev')
+// const { build, Program } = require('../../tui-program/dist/index.cjs')
 
 console.log(Program)
 /**
