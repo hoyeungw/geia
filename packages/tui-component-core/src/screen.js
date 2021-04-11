@@ -21,16 +21,12 @@ export class Screen extends Node {
       super()
       return new Screen(options)
     }
-
     Screen.bind(this)
-
     options = options || {}
     if (options.rsety && options.listen) {
       options = { program: options }
     }
-
     this.program = options.program
-
     if (!this.program) {
       this.program = Program.build({
         input: options.input,
@@ -55,22 +51,15 @@ export class Screen extends Node {
         this.program.tput.unicode = options.forceUnicode
       }
     }
-
     this.tput = this.program.tput
-
     super(options)
-
     this.autoPadding = options.autoPadding !== false
     this.tabc = Array((options.tabSize || 4) + 1).join(' ')
     this.dockBorders = options.dockBorders
-
     this.ignoreLocked = options.ignoreLocked || []
-
     this._unicode = this.tput.unicode || this.tput.numbers.U8 === 1
     this.fullUnicode = this.options.fullUnicode && this._unicode
-
     this.dattr = ((0 << 18) | (0x1ff << 9)) | 0x1ff
-
     this.renders = 0
     this.position = {
       left: this.left = this.aleft = this.rleft = 0,
@@ -80,21 +69,18 @@ export class Screen extends Node {
       get height() { return self.height },
       get width() { return self.width }
     }
-
     this.ileft = 0
     this.itop = 0
     this.iright = 0
     this.ibottom = 0
     this.iheight = 0
     this.iwidth = 0
-
     this.padding = {
       left: 0,
       top: 0,
       right: 0,
       bottom: 0
     }
-
     this.hover = null
     this.history = []
     this.clickable = []
@@ -103,20 +89,16 @@ export class Screen extends Node {
     this.lockKeys = false
     this.focused
     this._buf = ''
-
     this._ci = -1
-
     if (options.title) {
       this.title = options.title
     }
-
     options.cursor = options.cursor || {
       artificial: options.artificialCursor,
       shape: options.cursorShape,
       blink: options.cursorBlink,
       color: options.cursorColor
     }
-
     this.cursor = {
       artificial: options.cursor.artificial || false,
       shape: options.cursor.shape || 'block',
@@ -126,7 +108,6 @@ export class Screen extends Node {
       _state: 1,
       _hidden: true
     }
-
     this.program.on('resize', function () {
       self.alloc()
       self.render();
@@ -135,19 +116,15 @@ export class Screen extends Node {
         el.children.forEach(emit)
       })(self)
     })
-
     this.program.on('focus', function () {
       self.emit('focus')
     })
-
     this.program.on('blur', function () {
       self.emit('blur')
     })
-
     this.program.on('warning', function (text) {
       self.emit('warning', text)
     })
-
     this.on('newListener', function fn(type) {
       if (type === 'keypress' || type.indexOf('key ') === 0 || type === 'mouse') {
         if (type === 'keypress' || type.indexOf('key ') === 0) self._listenKeys()
@@ -166,68 +143,29 @@ export class Screen extends Node {
         self._listenMouse()
       }
     })
-
     this.setMaxListeners(Infinity)
-
     this.enter()
-
     this.postEnter()
   }
+  static global = null
+  static total = 0
+  static instances = []
+  get title() { return this.program.title }
+  set title(title) { return this.program.title = title }
+  get terminal() { return this.program.terminal }
+  set terminal(terminal) {return this.setTerminal(terminal), this.program.terminal}
+  get cols() { return this.program.cols }
+  get rows() { return this.program.rows }
+  get width() { return this.program.cols }
+  get height() { return this.program.rows }
+  get focused() { return this.history[this.history.length - 1] }
+  set focused(el) {return this.focusPush(el) }
 }
-
-Screen.global = null
-
-Screen.total = 0
-
-Screen.instances = []
-
-
-Screen.prototype.__defineGetter__('title', function () {
-  return this.program.title
-})
-
-Screen.prototype.__defineSetter__('title', function (title) {
-  return this.program.title = title
-})
-
-Screen.prototype.__defineGetter__('terminal', function () {
-  return this.program.terminal
-})
-
-Screen.prototype.__defineSetter__('terminal', function (terminal) {
-  this.setTerminal(terminal)
-  return this.program.terminal
-})
-
-Screen.prototype.__defineGetter__('cols', function () {
-  return this.program.cols
-})
-
-Screen.prototype.__defineGetter__('rows', function () {
-  return this.program.rows
-})
-
-Screen.prototype.__defineGetter__('width', function () {
-  return this.program.cols
-})
-
-Screen.prototype.__defineGetter__('height', function () {
-  return this.program.rows
-})
-
-Screen.prototype.__defineGetter__('focused', function () {
-  return this.history[this.history.length - 1]
-})
-
-Screen.prototype.__defineSetter__('focused', function (el) {
-  return this.focusPush(el)
-})
 
 /**
  * Angle Table
  */
-
-var angles = {
+const angles = {
   '\u2518': true, // '┘'
   '\u2510': true, // '┐'
   '\u250c': true, // '┌'
@@ -240,8 +178,7 @@ var angles = {
   '\u2502': true, // '│'
   '\u2500': true  // '─'
 }
-
-var langles = {
+const langles = {
   '\u250c': true, // '┌'
   '\u2514': true, // '└'
   '\u253c': true, // '┼'
@@ -250,8 +187,7 @@ var langles = {
   '\u252c': true, // '┬'
   '\u2500': true  // '─'
 }
-
-var uangles = {
+const uangles = {
   '\u2510': true, // '┐'
   '\u250c': true, // '┌'
   '\u253c': true, // '┼'
@@ -260,8 +196,7 @@ var uangles = {
   '\u252c': true, // '┬'
   '\u2502': true  // '│'
 }
-
-var rangles = {
+const rangles = {
   '\u2518': true, // '┘'
   '\u2510': true, // '┐'
   '\u253c': true, // '┼'
@@ -270,8 +205,7 @@ var rangles = {
   '\u252c': true, // '┬'
   '\u2500': true  // '─'
 }
-
-var dangles = {
+const dangles = {
   '\u2518': true, // '┘'
   '\u2514': true, // '└'
   '\u253c': true, // '┼'
@@ -280,7 +214,6 @@ var dangles = {
   '\u2534': true, // '┴'
   '\u2502': true  // '│'
 }
-
 // var cdangles = {
 //   '\u250c': true  // '┌'
 // };
@@ -288,7 +221,7 @@ var dangles = {
 // Every ACS angle character can be
 // represented by 4 bits ordered like this:
 // [langle][uangle][rangle][dangle]
-var angleTable = {
+const angleTable = {
   '0000': '', // ?
   '0001': '\u2502', // '│' // ?
   '0010': '\u2500', // '─' // ??
@@ -306,7 +239,6 @@ var angleTable = {
   '1110': '\u2534', // '┴'
   '1111': '\u253c'  // '┼'
 }
-
 Object.keys(angleTable).forEach(function (key) {
   angleTable[parseInt(key, 2)] = angleTable[key]
   delete angleTable[key]

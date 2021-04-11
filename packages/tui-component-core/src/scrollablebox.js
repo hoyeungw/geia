@@ -357,11 +357,9 @@ export class ScrollableBox extends Box {
     const m = Math.max(this._clines.length, this._scrollBottom())
     return this.scrollTo((i / 100) * m | 0)
   }
+  // XXX Potentially use this in place of scrollable checks elsewhere.
+  get reallyScrollable() {
+    if (this.shrink) return this.scrollable
+    return this.getScrollHeight() > this.height
+  }
 }
-
-
-// XXX Potentially use this in place of scrollable checks elsewhere.
-ScrollableBox.prototype.__defineGetter__('reallyScrollable', function () {
-  if (this.shrink) return this.scrollable
-  return this.getScrollHeight() > this.height
-})
