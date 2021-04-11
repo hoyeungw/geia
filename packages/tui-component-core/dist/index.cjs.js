@@ -189,7 +189,7 @@ class Screen extends Node {
       return new Screen(_options);
     }
 
-    Screen.bind(this);
+    Screen.bindStatic(this);
     _options = _options || {};
 
     if (_options.rsety && _options.listen) {
@@ -432,7 +432,7 @@ class Screen extends Node {
     return this.focusPush(el);
   }
 
-  static bind(screen) {
+  static bindStatic(screen) {
     if (!Screen.global) {
       Screen.global = screen;
     }

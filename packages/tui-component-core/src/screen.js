@@ -158,16 +158,13 @@ export class Screen extends Node {
   set focused(el) {return this.focusPush(el) }
   static bindStatic(screen) {
     if (!Screen.global) { Screen.global = screen}
-
     if (!~Screen.instances.indexOf(screen)) {
       Screen.instances.push(screen)
       screen.index = Screen.total
       Screen.total++
     }
-
     if (Screen._bound) return
     Screen._bound = true
-
     process.on('uncaughtException', Screen._exceptionHandler = function (err) {
       if (process.listeners('uncaughtException').length > 1) { return }
       Screen.instances.slice().forEach(function (screen) {
@@ -177,7 +174,6 @@ export class Screen extends Node {
       console.error(err.stack ? err.stack + '' : err + '')
       nextTick(function () { process.exit(1)})
     });
-
     [ 'SIGTERM', 'SIGINT', 'SIGQUIT' ].forEach(function (signal) {
       const name = '_' + signal.toLowerCase() + 'Handler'
       process.on(signal, Screen[name] = function () {
@@ -185,7 +181,6 @@ export class Screen extends Node {
         nextTick(function () { process.exit(0)})
       })
     })
-
     process.on('exit', Screen._exitHandler = function () {
       Screen.instances.slice().forEach(function (screen) { screen.destroy()})
     })
