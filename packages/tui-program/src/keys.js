@@ -162,13 +162,13 @@ function emitKeys(stream, s) {
       key.name = s.toLowerCase()
       key.shift = true
 
-    } else if (parts = metaKeyCodeRe.exec(s)) {
+    } else if ((parts = metaKeyCodeRe.exec(s))) {
       // meta+character key
       key.name = parts[1].toLowerCase()
       key.meta = true
       key.shift = /^[A-Z]$/.test(parts[1])
 
-    } else if (parts = functionKeyCodeRe.exec(s)) {
+    } else if ((parts = functionKeyCodeRe.exec(s))) {
       // ansi escape sequence
 
       // reassemble the key code leaving out leading \x1b's,

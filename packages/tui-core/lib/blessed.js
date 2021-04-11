@@ -11,7 +11,7 @@
 function blessed() { return blessed.program(...arguments) }
 
 blessed.program = blessed.Program = require('./program').build
-blessed.tput = blessed.Tput = require('./tput')
+blessed.tput = blessed.Tput = require('./tput').Tput
 blessed.widget = require('./widget')
 blessed.colors = require('./tools/colors')
 blessed.unicode = require('./tools/unicode')

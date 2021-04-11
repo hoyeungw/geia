@@ -3,13 +3,16 @@
  * Copyright (c) 2013-2015, Christopher Jeffrey and contributors (MIT License).
  * https://github.com/chjj/blessed
  */
+import { assign } from '@ject/mixin'
+
 const net = require('net')
 const fs = require('fs')
 const EventEmitter = require('./tools/events').EventEmitter
-
+const GeiaEventEmitter = require('@geia/tui-events').EventEmitter
 const GPM_USE_MAGIC = false
 
-const GPM_MOVE = 1,
+const
+  GPM_MOVE = 1,
   GPM_DRAG = 2,
   GPM_DOWN = 4,
   GPM_UP = 8
@@ -92,7 +95,8 @@ function parseEvent(raw) {
 function GpmClient(options) {
   if (!(this instanceof GpmClient)) return new GpmClient(options)
 
-  EventEmitter.call(this)
+  assign(this, new GeiaEventEmitter())
+  // EventEmitter.call(this)
 
   const pid = process.pid
 
@@ -187,12 +191,10 @@ function GpmClient(options) {
   }
 }
 
-GpmClient.prototype.__proto__ = EventEmitter.prototype
+GpmClient.prototype.__proto__ = GeiaEventEmitter.prototype
 
 GpmClient.prototype.stop = function () {
-  if (this.gpm) {
-    this.gpm.end()
-  }
+  if (this.gpm) this.gpm.end()
   delete this.gpm
 }
 

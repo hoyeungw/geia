@@ -8,7 +8,7 @@
  * Modules
  */
 const { build, Program } = require('./program.prev')
-// const { build, Program } = require('../../tui-program/dist/index.cjs')
+// const { build, Program } = require('@geia/tui-program')
 
 console.log(Program)
 /**

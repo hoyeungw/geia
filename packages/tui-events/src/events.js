@@ -10,6 +10,7 @@ export class EventEmitter {
    */
   constructor() {
     if (!this._events) this._events = {}
+    console.log('>>> [EventEmitter is constructed]')
   }
   static listenerCount
   build() { return new EventEmitter() }

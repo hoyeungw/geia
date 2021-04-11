@@ -21,7 +21,8 @@
   "dependencies": {
     "@geia/tui-events": "^0.0.19",
     "@geia/tui-program": "^0.0.19",
-    "@ject/mixin": "^0.0.9"
+    "@ject/mixin": "^0.0.9",
+    "@geia/tui-terminfo-parser": "^0.0.19"
   },
   "repository": "git://github.com/chjj/blessed.git",
   "homepage": "https://github.com/chjj/blessed",

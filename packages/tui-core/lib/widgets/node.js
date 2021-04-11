@@ -4,10 +4,13 @@
  * https://github.com/chjj/blessed
  */
 
+const { assign } = require('@ject/mixin')
+
 /**
  * Modules
  */
 const EventEmitter = require('../tools/events').EventEmitter
+const GeiaEventEmitter = require('@geia/tui-events').EventEmitter
 
 /**
  * Node
@@ -18,8 +21,9 @@ function Node(options) {
   const Screen = require('./screen')
 
   if (!(this instanceof Node)) return new Node(options)
-
-  EventEmitter.call(this)
+  assign(this, new GeiaEventEmitter())
+  console.log('>>> [Node created]', this.type)
+  // EventEmitter.call(this)
 
   options = options || {}
   this.options = options
@@ -74,7 +78,7 @@ function Node(options) {
 
 Node.uid = 0
 
-Node.prototype.__proto__ = EventEmitter.prototype
+Node.prototype.__proto__ = GeiaEventEmitter.prototype
 
 Node.prototype.type = 'node'
 

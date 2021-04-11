@@ -844,7 +844,7 @@ class Program extends EventEmitter {
     this.reqmp = this.requestLocatorPosition;
     this.decic = this.insertColumns;
     this.decdc = this.deleteColumns;
-    console.log("programmed");
+    console.log(">>> [Program constructed]");
     const self = this; // if (!(this instanceof Program)) return new Program(options)
     // Program.bind(this)
     // EventEmitter.call(this)
@@ -2262,12 +2262,7 @@ class Program extends EventEmitter {
 
   _write(text) {
     if (this.ret) return text;
-
-    if (this.useBuffer) {
-      return this._buffer(text);
-    }
-
-    return this._owrite(text);
+    return this.useBuffer ? this._buffer(text) : this._owrite(text);
   } // Example: `DCS tmux; ESC Pt ST`
   // Real: `DCS tmux; ESC Pt ESC \`
 
@@ -2881,11 +2876,7 @@ class Program extends EventEmitter {
 
 
   selData(a, b) {
-    if (this.has('Ms')) {
-      return this.put.Ms(a, b);
-    }
-
-    return this._twrite('\x1b]52;' + a + ';' + b + '\x07');
+    return this.has('Ms') ? this.put.Ms(a, b) : this._twrite('\x1b]52;' + a + ';' + b + '\x07');
   }
   /**
    * CSI

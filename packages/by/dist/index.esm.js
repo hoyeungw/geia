@@ -1,13 +1,13 @@
 import { AGENT, MASTER, WORKER, MAIN } from '@geia/enum-roles';
 import { Palett } from '@palett/cards';
 import { DyeFactory } from '@palett/dye';
+import { HEX } from '@palett/enum-color-space';
 import { ros } from '@palett/says';
 import { OBJ, NUM } from '@typen/enum-data-types';
 import { nullish } from '@typen/nullish';
 import { BOLD } from '@palett/enum-font-effects';
 import { SUBTLE, INSTA } from '@palett/presets';
 import { Pigment } from '@palett/projector';
-import { HEX } from '@palett/enum-color-space';
 
 const pigShade = Pigment({
   min: 0,

@@ -5,13 +5,13 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var enumRoles = require('@geia/enum-roles');
 var cards = require('@palett/cards');
 var dye = require('@palett/dye');
+var enumColorSpace = require('@palett/enum-color-space');
 var says = require('@palett/says');
 var enumDataTypes = require('@typen/enum-data-types');
 var nullish = require('@typen/nullish');
 var enumFontEffects = require('@palett/enum-font-effects');
 var presets = require('@palett/presets');
 var projector = require('@palett/projector');
-var enumColorSpace = require('@palett/enum-color-space');
 
 const pigShade = projector.Pigment({
   min: 0,

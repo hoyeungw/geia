@@ -16,6 +16,7 @@ const
 
 const { deco } = require('@spare/deco')
 const { EventEmitter: GeiaEventEmitter } = require('@geia/tui-events')
+const { Tput: GeiaTput } = require('@geia/tui-terminfo-parser')
 const
   Tput = require('./tput'),
   colors = require('./tools/colors'),
@@ -161,7 +162,6 @@ Program.configSingleton = function (program) {
   })
 }
 
-
 Program.prototype.type = 'program'
 
 Program.prototype.log = function () {
@@ -247,7 +247,7 @@ Program.prototype.setupTput = function () {
     options = this.options,
     write = this._write.bind(this)
 
-  const tput = this.tput = new Tput({
+  const tput = this.tput = new GeiaTput({
     terminal: this.terminal,
     padding: options.padding,
     extended: options.extended,

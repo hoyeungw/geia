@@ -29,7 +29,7 @@ export class Program extends EventEmitter {
   type = 'program'
   constructor(options) {
     super()
-    console.log("programmed")
+    console.log(">>> [Program constructed]")
     const self = this
 
     // if (!(this instanceof Program)) return new Program(options)
@@ -1472,17 +1472,17 @@ export class Program extends EventEmitter {
   }
   _write(text) {
     if (this.ret) return text
-    if (this.useBuffer) {
-      return this._buffer(text)
-    }
-    return this._owrite(text)
+    return this.useBuffer
+      ? this._buffer(text)
+      : this._owrite(text)
   }
 
 // Example: `DCS tmux; ESC Pt ST`
 // Real: `DCS tmux; ESC Pt ESC \`
   _twrite(data) {
     const self = this
-    let iterations = 0,
+    let
+      iterations = 0,
       timer
 
     if (this.tmux) {
@@ -2017,7 +2017,6 @@ export class Program extends EventEmitter {
     //   // }
     //   return this._write('\x1bk' + title + '\x1b\\');
     // }
-
     return this._twrite('\x1b]0;' + title + '\x07')
   }
 
@@ -2046,10 +2045,9 @@ export class Program extends EventEmitter {
 // OSC Ps ; Pt BEL
 //   Sel data
   selData(a, b) {
-    if (this.has('Ms')) {
-      return this.put.Ms(a, b)
-    }
-    return this._twrite('\x1b]52;' + a + ';' + b + '\x07')
+    return this.has('Ms')
+      ? this.put.Ms(a, b)
+      : this._twrite('\x1b]52;' + a + ';' + b + '\x07')
   }
 
   /**

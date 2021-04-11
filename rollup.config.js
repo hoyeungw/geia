@@ -26,7 +26,7 @@ export default [
         comments: true,
         sourceMap: true,
         exclude: 'node_modules/**',
-        babelHelpers: 'bundled',
+        // babelHelpers: 'bundled',
         presets: [
           [ '@babel/preset-env', { targets: { node: '14' } } ]
         ],
