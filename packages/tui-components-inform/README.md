@@ -1,4 +1,4 @@
-# @geia/tui-components-status
+# @geia/tui-components-inform
 
 [![npm version][badge-npm-version]][url-npm]
 [![npm download monthly][badge-npm-download-monthly]][url-npm]
@@ -33,7 +33,7 @@ $ npm install @geia/cluster-fork
 
 #### Usage
 ```js
-import { Signaler } from '@geia/tui-components-status'
+import { Signaler } from '@geia/tui-components-inform'
 Signaler.register(instance,process,)
 ```
 

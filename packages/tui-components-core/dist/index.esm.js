@@ -1,6 +1,7 @@
 import * as colors$1 from '@geia/tui-colors';
 import * as helpers$1 from '@geia/tui-helpers';
 import * as unicode$1 from '@geia/tui-unicode';
+import { assign } from '@ject/mixin';
 import assert from 'assert';
 import { EventEmitter } from '@geia/tui-events';
 import { Program } from '@geia/tui-program';
@@ -12,7 +13,7 @@ import util from 'util';
  * https://github.com/chjj/blessed
  */
 const nextTick$2 = global.setImmediate || process.nextTick.bind(process);
-class Screen extends Node {
+class Screen$1 extends Node {
   constructor(_options) {
     super(_options);
     this.type = 'screen';
@@ -154,10 +155,10 @@ class Screen extends Node {
       };
 
       this.cursorReset = this.resetCursor;
-      return new Screen(_options);
+      return new Screen$1(_options);
     }
 
-    Screen.configSingleton(this);
+    Screen$1.configSingleton(this);
     _options = _options || {};
 
     if (_options.rsety && _options.listen) {
@@ -401,24 +402,24 @@ class Screen extends Node {
   }
 
   static configSingleton(screen) {
-    if (!Screen.global) {
-      Screen.global = screen;
+    if (!Screen$1.global) {
+      Screen$1.global = screen;
     }
 
-    if (!~Screen.instances.indexOf(screen)) {
-      Screen.instances.push(screen);
-      screen.index = Screen.total;
-      Screen.total++;
+    if (!~Screen$1.instances.indexOf(screen)) {
+      Screen$1.instances.push(screen);
+      screen.index = Screen$1.total;
+      Screen$1.total++;
     }
 
-    if (Screen._bound) return;
-    Screen._bound = true;
-    process.on('uncaughtException', Screen._exceptionHandler = function (err) {
+    if (Screen$1._bound) return;
+    Screen$1._bound = true;
+    process.on('uncaughtException', Screen$1._exceptionHandler = function (err) {
       if (process.listeners('uncaughtException').length > 1) {
         return;
       }
 
-      Screen.instances.slice().forEach(function (screen) {
+      Screen$1.instances.slice().forEach(function (screen) {
         screen.destroy();
       });
       err = err || new Error('Uncaught Exception.');
@@ -429,7 +430,7 @@ class Screen extends Node {
     });
     ['SIGTERM', 'SIGINT', 'SIGQUIT'].forEach(function (signal) {
       const name = '_' + signal.toLowerCase() + 'Handler';
-      process.on(signal, Screen[name] = function () {
+      process.on(signal, Screen$1[name] = function () {
         if (process.listeners(signal).length > 1) {
           return;
         }
@@ -439,8 +440,8 @@ class Screen extends Node {
         });
       });
     });
-    process.on('exit', Screen._exitHandler = function () {
-      Screen.instances.slice().forEach(function (screen) {
+    process.on('exit', Screen$1._exitHandler = function () {
+      Screen$1.instances.slice().forEach(function (screen) {
         screen.destroy();
       });
     });
@@ -609,26 +610,26 @@ class Screen extends Node {
 
   destroy() {
     this.leave();
-    const index = Screen.instances.indexOf(this);
+    const index = Screen$1.instances.indexOf(this);
 
     if (~index) {
-      Screen.instances.splice(index, 1);
-      Screen.total--;
-      Screen.global = Screen.instances[0];
+      Screen$1.instances.splice(index, 1);
+      Screen$1.total--;
+      Screen$1.global = Screen$1.instances[0];
 
-      if (Screen.total === 0) {
-        Screen.global = null;
-        process.removeListener('uncaughtException', Screen._exceptionHandler);
-        process.removeListener('SIGTERM', Screen._sigtermHandler);
-        process.removeListener('SIGINT', Screen._sigintHandler);
-        process.removeListener('SIGQUIT', Screen._sigquitHandler);
-        process.removeListener('exit', Screen._exitHandler);
-        delete Screen._exceptionHandler;
-        delete Screen._sigtermHandler;
-        delete Screen._sigintHandler;
-        delete Screen._sigquitHandler;
-        delete Screen._exitHandler;
-        delete Screen._bound;
+      if (Screen$1.total === 0) {
+        Screen$1.global = null;
+        process.removeListener('uncaughtException', Screen$1._exceptionHandler);
+        process.removeListener('SIGTERM', Screen$1._sigtermHandler);
+        process.removeListener('SIGINT', Screen$1._sigintHandler);
+        process.removeListener('SIGQUIT', Screen$1._sigquitHandler);
+        process.removeListener('exit', Screen$1._exitHandler);
+        delete Screen$1._exceptionHandler;
+        delete Screen$1._sigtermHandler;
+        delete Screen$1._sigintHandler;
+        delete Screen$1._sigquitHandler;
+        delete Screen$1._exitHandler;
+        delete Screen$1._bound;
       }
 
       this.destroyed = true;
@@ -2310,9 +2311,9 @@ class Screen extends Node {
  * Angle Table
  */
 
-Screen.global = null;
-Screen.total = 0;
-Screen.instances = [];
+Screen$1.global = null;
+Screen$1.total = 0;
+Screen$1.instances = [];
 const angles = {
   '\u2518': true,
   // '┘'
@@ -2468,18 +2469,18 @@ class Node extends EventEmitter {
     if (!this.screen) {
       if (this.type === 'screen') {
         this.screen = this;
-      } else if (Screen.total === 1) {
-        this.screen = Screen.global;
+      } else if (Screen$1.total === 1) {
+        this.screen = Screen$1.global;
       } else if (options.parent) {
         this.screen = options.parent;
 
         while (this.screen && this.screen.type !== 'screen') {
           this.screen = this.screen.parent;
         }
-      } else if (Screen.total) {
+      } else if (Screen$1.total) {
         // This _should_ work in most cases as long as the element is appended
         // synchronously after the screen's creation. Throw error if not.
-        this.screen = Screen.instances[Screen.instances.length - 1];
+        this.screen = Screen$1.instances[Screen$1.instances.length - 1];
         process.nextTick(function () {
           if (!self.parent) {
             throw new Error('Element (' + self.type + ')' + ' was not appended synchronously after the' + ' screen\'s creation. Please set a `parent`' + ' or `screen` option in the element\'s constructor' + ' if you are going to use multiple screens and' + ' append the element later.');
@@ -3099,7 +3100,8 @@ class Element$1 extends Node {
         Object.defineProperty(this, key, desc);
       }, this);
       this._ignore = true;
-      ScrollableBox.call(this, options);
+      assign(this, new ScrollableBox(options)); // ScrollableBox.call(this, options)
+
       delete this._ignore;
       return this;
     }
@@ -5758,4 +5760,22 @@ class Log$1 extends ScrollableText {
 
 }
 
-export { Box, Element$1 as Element, Log$1 as Log, Node, Screen, ScrollableBox, ScrollableText };
+// export { Line }  from './src/line'
+// export { Terminal }  from './src/terminal'
+
+class TUIComponentsCore {
+  static get Screen() {
+    if (!TUIComponentsCore._screen) TUIComponentsCore._screen = Screen;
+    return TUIComponentsCore._screen;
+  }
+
+  static get Element() {
+    if (!TUIComponentsCore._element) TUIComponentsCore._element = Element;
+    return TUIComponentsCore._element;
+  }
+
+}
+TUIComponentsCore._screen = void 0;
+TUIComponentsCore._element = void 0;
+
+export { Box, Element$1 as Element, Log$1 as Log, Node, Screen$1 as Screen, ScrollableBox, ScrollableText, TUIComponentsCore };
