@@ -157,7 +157,7 @@ class Screen extends Node {
       return new Screen(_options);
     }
 
-    Screen.bindStatic(this);
+    Screen.configSingleton(this);
     _options = _options || {};
 
     if (_options.rsety && _options.listen) {
@@ -400,7 +400,7 @@ class Screen extends Node {
     return this.focusPush(el);
   }
 
-  static bindStatic(screen) {
+  static configSingleton(screen) {
     if (!Screen.global) {
       Screen.global = screen;
     }
@@ -3095,7 +3095,8 @@ class Element$1 extends Node {
     if (options.scrollable && !this._ignore && this.type !== 'scrollable-box') {
       Object.getOwnPropertyNames(ScrollableBox.prototype).forEach(function (key) {
         if (key === 'type') return;
-        Object.defineProperty(this, key, Object.getOwnPropertyDescriptor(ScrollableBox.prototype, key));
+        const desc = Object.getOwnPropertyDescriptor(ScrollableBox.prototype, key);
+        Object.defineProperty(this, key, desc);
       }, this);
       this._ignore = true;
       ScrollableBox.call(this, options);

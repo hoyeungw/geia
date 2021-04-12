@@ -19,7 +19,8 @@
     "@geia/tui-events": "^0.0.19",
     "@geia/tui-helpers": "^0.0.19",
     "@geia/tui-program": "^0.0.19",
-    "@geia/tui-unicode": "^0.0.19"
+    "@geia/tui-unicode": "^0.0.19",
+    "@ject/mixin": "^0.0.9"
   },
   "repository": {
     "type": "git",

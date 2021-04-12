@@ -4,16 +4,12 @@
  * https://github.com/chjj/blessed
  */
 
-import * as colors  from '@geia/tui-colors'
-import * as helpers from '@geia/tui-helpers'
-import * as unicode from '@geia/tui-unicode'
-/**
- * Modules
- */
-import assert       from 'assert'
-
-import { Node } from './node'
-
+import * as colors       from '@geia/tui-colors'
+import * as helpers      from '@geia/tui-helpers'
+import * as unicode      from '@geia/tui-unicode'
+import { assign }        from '@ject/mixin'
+import assert            from 'assert'
+import { Node }          from './node'
 import { ScrollableBox } from './scrollablebox'
 
 const nextTick = global.setImmediate || process.nextTick.bind(process)
@@ -34,12 +30,13 @@ export class Element extends Node {
         .forEach(
           function (key) {
             if (key === 'type') return
-            Object.defineProperty(this, key, Object.getOwnPropertyDescriptor(ScrollableBox.prototype, key))
+            const desc = Object.getOwnPropertyDescriptor(ScrollableBox.prototype, key)
+            Object.defineProperty(this, key, desc)
           },
           this
         )
       this._ignore = true
-      ScrollableBox.call(this, options)
+      assign(this, new ScrollableBox(options)) // ScrollableBox.call(this, options)
       delete this._ignore
       return this
     }
