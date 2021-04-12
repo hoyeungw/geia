@@ -1,5 +1,5 @@
 {
-  "name": "@geia/tui-component-core",
+  "name": "@geia/tui-components-form",
   "version": "0.0.19",
   "description": "Core components for tui",
   "main": "dist/index.cjs.js",
@@ -24,13 +24,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hoyeungw/geia/tui-component-core.git"
+    "url": "git+https://github.com/hoyeungw/geia/tui-components-form.git"
   },
   "keywords": [
     "geia",
     "process",
     "signal-handler",
-    "tui-component-core"
+    "tui-components-form"
   ],
   "author": {
     "name": "Hoyeung Wong",

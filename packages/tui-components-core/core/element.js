@@ -10,7 +10,7 @@ import * as unicode      from '@geia/tui-unicode'
 import { assign }        from '@ject/mixin'
 import assert            from 'assert'
 import { Node }          from './node'
-import { ScrollableBox } from './scrollablebox'
+import { ScrollableBox } from '../src/scrollablebox'
 
 const nextTick = global.setImmediate || process.nextTick.bind(process)
 

@@ -4,11 +4,8 @@
  * https://github.com/chjj/blessed
  */
 
-/**
- * Modules
- */
 import util               from 'util'
-import { Node }           from './node'
+import { Node }           from '../core/node'
 import { ScrollableText } from './scrollabletext'
 
 const nextTick = global.setImmediate || process.nextTick.bind(process)

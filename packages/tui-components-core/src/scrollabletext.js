@@ -7,7 +7,7 @@
 /**
  * Modules
  */
-import { Node }          from './node'
+import { Node }          from '../core/node'
 import { ScrollableBox } from './scrollablebox'
 
 export class ScrollableText extends ScrollableBox {
