@@ -23,7 +23,7 @@ export class Screen extends Node {
       super()
       return new Screen(options)
     }
-    Screen.bindStatic(this)
+    Screen.configSingleton(this)
     options = options || {}
     if (options.rsety && options.listen) {
       options = { program: options }
@@ -156,7 +156,7 @@ export class Screen extends Node {
   get height() { return this.program.rows }
   get focused() { return this.history[this.history.length - 1] }
   set focused(el) {return this.focusPush(el) }
-  static bindStatic(screen) {
+  static configSingleton(screen) {
     if (!Screen.global) { Screen.global = screen}
     if (!~Screen.instances.indexOf(screen)) {
       Screen.instances.push(screen)

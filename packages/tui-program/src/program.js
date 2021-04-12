@@ -4,15 +4,15 @@
  * https://github.com/chjj/blessed
  */
 
-import * as colors       from '@geia/tui-colors'
-import { EventEmitter }  from '@geia/tui-events'
-import { Tput }          from '@geia/tui-terminfo-parser'
-import cp                from 'child_process'
-import fs                from 'fs'
-import { StringDecoder } from 'string_decoder'
-import util              from 'util'
-import { gpmClient }     from './gpmclient'
-import * as keys         from './keys'
+import * as colors            from '@geia/tui-colors'
+import { EventEmitter }       from '@geia/tui-events'
+import { Tput }               from '@geia/tui-terminfo-parser'
+import cp                     from 'child_process'
+import fs                     from 'fs'
+import { StringDecoder }      from 'string_decoder'
+import util                   from 'util'
+import { gpmClient }          from './gpmclient'
+import { emitKeypressEvents } from './keys'
 
 const slice = Array.prototype.slice
 
@@ -27,15 +27,14 @@ export function build(options) {
  */
 export class Program extends EventEmitter {
   type = 'program'
-  constructor(options) {
+  constructor(options = {}) {
     super()
     console.log(">>> [Program constructed]")
     const self = this
 
     // if (!(this instanceof Program)) return new Program(options)
-    // Program.bind(this)
+    Program.configSingleton(this)
     // EventEmitter.call(this)
-
     if (!options || options.__proto__ !== Object.prototype) {
       const [ input, output ] = arguments
       options = { input, output }
@@ -44,7 +43,6 @@ export class Program extends EventEmitter {
     this.options = options
     this.input = options.input || process.stdin
     this.output = options.output || process.stdout
-
     options.log = options.log || options.dump
     if (options.log) {
       this._logger = fs.createWriteStream(options.log)
@@ -65,17 +63,18 @@ export class Program extends EventEmitter {
     this.scrollTop = 0
     this.scrollBottom = this.rows - 1
 
-    this._terminal = options.terminal
-      || options.term
-      || process.env.TERM
-      || (process.platform === 'win32' ? 'windows-ansi' : 'xterm')
+    this._terminal = options.terminal ||
+      options.term ||
+      process.env.TERM ||
+      (process.platform === 'win32' ? 'windows-ansi' : 'xterm')
 
     this._terminal = this._terminal.toLowerCase()
 
     // OSX
     this.isOSXTerm = process.env.TERM_PROGRAM === 'Apple_Terminal'
-    this.isiTerm2 = process.env.TERM_PROGRAM === 'iTerm.app'
-      || !!process.env.ITERM_SESSION_ID
+    this.isiTerm2 =
+      process.env.TERM_PROGRAM === 'iTerm.app' ||
+      !!process.env.ITERM_SESSION_ID
 
     // VTE
     // NOTE: lxterminal does not provide an env variable to check for.
@@ -84,10 +83,11 @@ export class Program extends EventEmitter {
     this.isXFCE = /xfce/i.test(process.env.COLORTERM)
     this.isTerminator = !!process.env.TERMINATOR_UUID
     this.isLXDE = false
-    this.isVTE = !!process.env.VTE_VERSION
-      || this.isXFCE
-      || this.isTerminator
-      || this.isLXDE
+    this.isVTE =
+      !!process.env.VTE_VERSION ||
+      this.isXFCE ||
+      this.isTerminator ||
+      this.isLXDE
 
     // xterm and rxvt - not accurate
     this.isRxvt = /rxvt/i.test(process.env.COLORTERM)
@@ -118,7 +118,7 @@ export class Program extends EventEmitter {
   static global = null
   static total = 0
   static instances = []
-  static bind(program) {
+  static configSingleton(program) {
     if (!Program.global) Program.global = program
     if (!~Program.instances.indexOf(program)) {
       Program.instances.push(program)
@@ -277,7 +277,7 @@ export class Program extends EventEmitter {
 
   listen() {
     const self = this
-
+    console.log(`>>> [this.input._blessedInput = ${this.input._blessedInput}]`)
     // Potentially reset window title on exit:
     // if (!this.isRxvt) {
     //   if (!this.isVTE) this.setTitleModeFeature(3);
@@ -323,6 +323,8 @@ export class Program extends EventEmitter {
 
   _listenInput() {
     const self = this
+    console.log('>>> [Program.prototype._listenInput]')
+    setTimeout(() => {}, 3000)
     // Input
     this.input.on('keypress', this.input._keypressHandler = function (ch, key) {
       key = key || { ch: ch }
@@ -358,7 +360,7 @@ export class Program extends EventEmitter {
         program.emit('data', data)
       })
     })
-    keys.emitKeypressEvents(this.input)
+    emitKeypressEvents(this.input)
   }
 
   _listenOutput() {

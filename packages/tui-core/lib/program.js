@@ -7,8 +7,8 @@
 /**
  * Modules
  */
-const { build, Program } = require('./program.prev')
-// const { build, Program } = require('@geia/tui-program')
+// const { build, Program } = require('./program.prev')
+const { build, Program } = require('@geia/tui-program')
 
 console.log(Program)
 /**

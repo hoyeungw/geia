@@ -3,9 +3,11 @@
  * Copyright (c) 2010-2015, Joyent, Inc. and other contributors (MIT License)
  * https://github.com/chjj/blessed
  */
-import { EventEmitter } from '@geia/tui-events'
+import { EventEmitter }  from '@geia/tui-events'
+import { StringDecoder } from 'string_decoder' // lazy load
 
 // NOTE: node <=v0.8.x has no EventEmitter.listenerCount
+
 function listenerCount(stream, event) {
   return EventEmitter.listenerCount
     ? EventEmitter.listenerCount(stream, event)
@@ -18,7 +20,6 @@ function listenerCount(stream, event) {
 
 export function emitKeypressEvents(stream) {
   if (stream._keypressDecoder) return
-  const StringDecoder = require('string_decoder').StringDecoder  // lazy load
   stream._keypressDecoder = new StringDecoder('utf8')
 
   function onData(b) {
@@ -77,11 +78,13 @@ export function emitKeypressEvents(stream) {
 // Regexes used for ansi escape code splitting
 const metaKeyCodeReAnywhere = /(?:\x1b)([a-zA-Z0-9])/
 const metaKeyCodeRe = new RegExp('^' + metaKeyCodeReAnywhere.source + '$')
-const functionKeyCodeReAnywhere = new RegExp('(?:\x1b+)(O|N|\\[|\\[\\[)(?:' + [
-  '(\\d+)(?:;(\\d+))?([~^$])',
-  '(?:M([@ #!a`])(.)(.))', // mouse
-  '(?:1;)?(\\d+)?([a-zA-Z])'
-].join('|') + ')')
+const functionKeyCodeReAnywhere = new RegExp(
+  '(?:\x1b+)(O|N|\\[|\\[\\[)(?:' + [
+    '(\\d+)(?:;(\\d+))?([~^$])',
+    '(?:M([@ #!a`])(.)(.))', // mouse
+    '(?:1;)?(\\d+)?([a-zA-Z])'
+  ].join('|') + ')'
+)
 const functionKeyCodeRe = new RegExp('^' + functionKeyCodeReAnywhere.source)
 const escapeCodeReAnywhere = new RegExp([
   functionKeyCodeReAnywhere.source, metaKeyCodeReAnywhere.source, /\x1b./.source

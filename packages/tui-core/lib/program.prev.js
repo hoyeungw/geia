@@ -117,6 +117,7 @@ function Program(options) {
     this.setupTput()
   }
 
+  // console.log('self:', deco(self, { depth: 1, vert: 1 }))
   this.listen()
 }
 
@@ -371,32 +372,28 @@ Program.prototype.listen = function () {
 }
 
 Program.prototype._listenInput = function () {
-  const keys = require('./keys'),
+  const
+    keys = require('./keys'),
     self = this
-
   // Input
+  console.log('>>> [Program.prototype._listenInput]')
   this.input.on('keypress', this.input._keypressHandler = function (ch, key) {
     key = key || { ch: ch }
-
     if (key.name === 'undefined'
       && (key.code === '[M' || key.code === '[I' || key.code === '[O')) {
       // A mouse sequence. The `keys` module doesn't understand these.
       return
     }
-
     if (key.name === 'undefined') {
       // Not sure what this is, but we should probably ignore it.
       return
     }
-
     if (key.name === 'enter' && key.sequence === '\n') {
       key.name = 'linefeed'
     }
-
     if (key.name === 'return' && key.sequence === '\r') {
       self.input.emit('keypress', ch, merge({}, key, { name: 'enter' }))
     }
-
     const name = (key.ctrl ? 'C-' : '')
       + (key.meta ? 'M-' : '')
       + (key.shift && key.name ? 'S-' : '')
@@ -410,14 +407,12 @@ Program.prototype._listenInput = function () {
       program.emit('key ' + name, ch, key)
     })
   })
-
   this.input.on('data', this.input._dataHandler = function (data) {
     Program.instances.forEach(function (program) {
       if (program.input !== self.input) return
       program.emit('data', data)
     })
   })
-
   keys.emitKeypressEvents(this.input)
 }
 

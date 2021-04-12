@@ -8,9 +8,9 @@ class EventEmitter {
    * EventEmitter
    */
   constructor() {
-    if (!this._events) this._events = {};
-    console.log('>>> [EventEmitter is constructed]');
-  }
+    if (!this._events) this._events = {}; // console.log('>>> [EventEmitter is constructed]')
+  } // static listenerCount
+
 
   build() {
     return new EventEmitter();
@@ -134,7 +134,6 @@ class EventEmitter {
   }
 
 }
-EventEmitter.listenerCount = void 0;
 const slice = Array.prototype.slice; // For hooking into the main EventEmitter if we want to.
 // Might be better to do things this way being that it
 // will always be compatible with node, not to mention

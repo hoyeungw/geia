@@ -221,19 +221,14 @@ Screen.bind = function (screen) {
   [ 'SIGTERM', 'SIGINT', 'SIGQUIT' ].forEach(function (signal) {
     const name = '_' + signal.toLowerCase() + 'Handler'
     process.on(signal, Screen[name] = function () {
-      if (process.listeners(signal).length > 1) {
-        return
-      }
-      nextTick(function () {
-        process.exit(0)
-      })
+      console.log(`>>> [process on signal: ${signal}]`)
+      if (process.listeners(signal).length > 1) return
+      nextTick(function () { process.exit(0) })
     })
   })
 
   process.on('exit', Screen._exitHandler = function () {
-    Screen.instances.slice().forEach(function (screen) {
-      screen.destroy()
-    })
+    Screen.instances.slice().forEach(function (screen) { screen.destroy() })
   })
 }
 
@@ -1699,7 +1694,8 @@ Screen.prototype.clearRegion = function (xi, xl, yi, yl, override) {
 
 Screen.prototype.fillRegion = function (attr, ch, xi, xl, yi, yl, override) {
   const lines = this.lines
-  let cell,
+  let
+    cell,
     xx
 
   if (xi < 0) xi = 0
@@ -1738,7 +1734,8 @@ Screen.prototype.spawn = function (file, args, options) {
     args = []
   }
 
-  const screen = this,
+  const
+    screen = this,
     program = screen.program,
     spawn = require('child_process').spawn,
     mouse = program.mouseEnabled

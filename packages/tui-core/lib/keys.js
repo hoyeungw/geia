@@ -31,14 +31,12 @@ function emitKeypressEvents(stream) {
       stream.on('newListener', onNewListener)
     }
   }
-
   function onNewListener(event) {
     if (event === 'keypress') {
       stream.on('data', onData)
       stream.removeListener('newListener', onNewListener)
     }
   }
-
   if (listenerCount(stream, 'keypress') > 0) {
     stream.on('data', onData)
   } else {

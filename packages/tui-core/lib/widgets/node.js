@@ -22,7 +22,7 @@ function Node(options) {
 
   if (!(this instanceof Node)) return new Node(options)
   assign(this, new GeiaEventEmitter())
-  console.log('>>> [Node created]', this.type)
+  // console.log('>>> [Node created]', this.type)
   // EventEmitter.call(this)
 
   options = options || {}

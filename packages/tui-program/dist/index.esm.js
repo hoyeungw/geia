@@ -207,6 +207,7 @@ class GpmClient extends EventEmitter {
  * Copyright (c) 2010-2015, Joyent, Inc. and other contributors (MIT License)
  * https://github.com/chjj/blessed
  */
+// NOTE: node <=v0.8.x has no EventEmitter.listenerCount
 
 function listenerCount(stream, event) {
   return EventEmitter.listenerCount ? EventEmitter.listenerCount(stream, event) : stream.listeners(event).length;
@@ -218,10 +219,6 @@ function listenerCount(stream, event) {
 
 function emitKeypressEvents(stream) {
   if (stream._keypressDecoder) return;
-
-  const StringDecoder = require('string_decoder').StringDecoder; // lazy load
-
-
   stream._keypressDecoder = new StringDecoder('utf8');
 
   function onData(b) {
@@ -731,7 +728,7 @@ function build(options) {
  */
 
 class Program extends EventEmitter {
-  constructor(options) {
+  constructor(options = {}) {
     super();
     this.type = 'program';
     this.unkey = this.removeKey;
@@ -846,8 +843,8 @@ class Program extends EventEmitter {
     this.decdc = this.deleteColumns;
     console.log(">>> [Program constructed]");
     const self = this; // if (!(this instanceof Program)) return new Program(options)
-    // Program.bind(this)
-    // EventEmitter.call(this)
+
+    Program.configSingleton(this); // EventEmitter.call(this)
 
     if (!options || options.__proto__ !== Object.prototype) {
       const [input, output] = arguments;
@@ -919,7 +916,7 @@ class Program extends EventEmitter {
     return new Program(options);
   }
 
-  static bind(program) {
+  static configSingleton(program) {
     if (!Program.global) Program.global = program;
 
     if (!~Program.instances.indexOf(program)) {
@@ -1100,7 +1097,8 @@ class Program extends EventEmitter {
   }
 
   listen() {
-    const self = this; // Potentially reset window title on exit:
+    const self = this;
+    console.log(`>>> [this.input._blessedInput = ${this.input._blessedInput}]`); // Potentially reset window title on exit:
     // if (!this.isRxvt) {
     //   if (!this.isVTE) this.setTitleModeFeature(3);
     //   this.manipulateWindow(21, function(err, data) {
@@ -1145,7 +1143,9 @@ class Program extends EventEmitter {
   }
 
   _listenInput() {
-    const self = this; // Input
+    const self = this;
+    console.log('>>> [Program.prototype._listenInput]');
+    setTimeout(() => {}, 3000); // Input
 
     this.input.on('keypress', this.input._keypressHandler = function (ch, key) {
       key = key || {
