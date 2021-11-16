@@ -2,6 +2,7 @@ export class Contractor {
   service
   agentPool
   #taskAgenda
+
   constructor(service, agentPool) {
     this.service = service
     this.agentPool = agentPool

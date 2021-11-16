@@ -1,6 +1,6 @@
 {
   "name": "@geia/signaler",
-  "version": "0.0.20",
+  "version": "0.1.0",
   "description": "Register exit and signal handlers to process",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -15,10 +15,10 @@
     "test": "node -r @babel/register test/test.index.js"
   },
   "dependencies": {
-    "@geia/descendant-pids": "^0.0.20",
-    "@geia/enum-events": "^0.0.20",
-    "@geia/enum-roles": "^0.0.20",
-    "@geia/enum-signals": "^0.0.20",
+    "@geia/descendant-pids": "^0.1.0",
+    "@geia/enum-events": "^0.1.0",
+    "@geia/enum-roles": "^0.1.0",
+    "@geia/enum-signals": "^0.1.0",
     "@palett/says": "^0.8.18",
     "@spare/logger": "^0.12.4",
     "@valjoux/timestamp-pretty": "^0.3.7",
