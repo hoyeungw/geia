@@ -1,7 +1,7 @@
 import { by }                                          from '@geia/by'
 import { DISCONNECT, ERROR, EXIT, UNCAUGHT_EXCEPTION } from '@geia/enum-events'
 import { MASTER, WORKER }                              from '@geia/enum-roles'
-import { says }                                        from '@palett/says'
+import { says }                                        from '@spare/says'
 import { INFO }                                        from '@spare/enum-loggers'
 import { decoFlat }                                    from '@spare/logger'
 import { nullish }                                     from '@typen/nullish'
@@ -51,7 +51,7 @@ export class Institute {
    */
   constructor(p = {}) {
     if (cluster.isWorker) { return void 0 }
-    this.count = p.count ?? ((os.cpus().length - 1) || 1)
+    this.count = p.count ?? ( ( os.cpus().length - 1 ) || 1 )
     this.refork = p.refork ?? true
     this.limit = p.limit || 60
     this.duration = p.duration || 60000
@@ -68,7 +68,7 @@ export class Institute {
         // use coverage for forked process
         // disabled reporting and output for child process
         // enable pid in child process coverage filename
-        const args = ['cover', '--report', 'none', '--print', 'none', '--include-pid', settings.exec,]
+        const args = [ 'cover', '--report', 'none', '--print', 'none', '--include-pid', settings.exec, ]
         if (settings?.args?.length) { args.push('--', ...settings.args) }
         settings.exec = './node_modules/.bin/istanbul'
         settings.args = args
@@ -90,7 +90,7 @@ export class Institute {
     for (let i = 0; i < this.count; i++) { worker = this.graduate() }
     // fork slaves after workers are forked
     if (p.slaves) {
-      const slaves = Array.isArray(p.slaves) ? p.slaves : [p.slaves]
+      const slaves = Array.isArray(p.slaves) ? p.slaves : [ p.slaves ]
       for (const settings of slaves.map(this.normalizeSlaveConfig)) if (settings) {
         worker = this.graduate({ settings })
       }
@@ -117,7 +117,7 @@ export class Institute {
   get allowRefork() {
     if (!this.refork) { return false }
     if (this.reforks.push(Date.now()) > this.limit) { this.reforks.shift() }
-    return this.withinForkLimit || (cluster.emit(REACH_REFORK_LIMIT), false)
+    return this.withinForkLimit || ( cluster.emit(REACH_REFORK_LIMIT), false )
   }
 
   get withinForkLimit() {
@@ -129,19 +129,20 @@ export class Institute {
     const logger = this.logger.level(worker[DISABLE_REFORK] ? INFO : ERROR)
     const W = by(worker, WORKER)
     this.disconnectCount++
-    `${ W } disconnects (${ decoFlat(this.exitInfo({ worker })) })` |> logger
+    `${W} disconnects (${decoFlat(this.exitInfo({ worker }))})` |> logger
     if (worker?.isDead()) { // worker has terminated before disconnect
-      return void (`not forking, because ${ W } exit event emits before disconnect` |> logger)
+      return void ( `not forking, because ${W} exit event emits before disconnect` |> logger )
     }
     if (worker[DISABLE_REFORK]) { // worker has terminated by master, like egg-cluster master will set disableRefork to true
-      return void (`not forking, because ${ W } will be killed soon` |> logger)
+      return void ( `not forking, because ${W} will be killed soon` |> logger )
     }
     this.disconnects[worker.process.pid] = dateTime()
     if (!this.allowRefork) {
-      `not forking new worker (refork: ${ this.refork })` |> logger
-    } else {
+      `not forking new worker (refork: ${this.refork})` |> logger
+    }
+    else {
       const newWorker = this.graduate({ settings: worker[GENE] });
-      `${ dateTime() } new ${ by(newWorker, WORKER) } fork (state: ${ newWorker.state })` |> logger
+      `${dateTime()} new ${by(newWorker, WORKER)} fork (state: ${newWorker.state})` |> logger
     }
   }
   onExit(worker, code, signal) {
@@ -149,33 +150,34 @@ export class Institute {
     const W = by(worker, WORKER)
     const isExpected = !!this.disconnects[worker.process.pid]
     const info = this.exitInfo({ worker, code, signal });
-    `${ W } exit (${ decoFlat(info) }) isExpected (${ isExpected })` |> logger
-    if (isExpected) { return void (delete this.disconnects[worker.process.pid]) } // worker disconnect first, exit expected
+    `${W} exit (${decoFlat(info)}) isExpected (${isExpected})` |> logger
+    if (isExpected) { return void ( delete this.disconnects[worker.process.pid] ) } // worker disconnect first, exit expected
     if (worker[DISABLE_REFORK]) { return void 0 }  // worker is killed by master
     this.unexpectedCount++
     if (!this.allowRefork) {
-      `not forking new worker (refork: ${ this.refork })` |> logger
-    } else {
+      `not forking new worker (refork: ${this.refork})` |> logger
+    }
+    else {
       const newWorker = this.graduate({ settings: worker[GENE] });
-      `new ${ by(newWorker, WORKER) } fork (state: ${ newWorker.state })` |> logger
+      `new ${by(newWorker, WORKER)} fork (state: ${newWorker.state})` |> logger
     }
     cluster.emit(UNEXPECTED_EXIT, worker, code, signal)
   }
   onUncaughtException(err) { // uncaughtException default handler
     if (!err) { return }
-    `master uncaughtException: ${ err.stack }` |> this.logger.level(ERROR);
-    `[error] ${ err }` |> this.logger;
-    `(total ${ this.disconnectCount } disconnect, ${ this.unexpectedCount } unexpected exit)` |> this.logger
+    `master uncaughtException: ${err.stack}` |> this.logger.level(ERROR);
+    `[error] ${err}` |> this.logger;
+    `(total ${this.disconnectCount} disconnect, ${this.unexpectedCount} unexpected exit)` |> this.logger
   }
   onUnexpectedExit(worker, code, signal) { // unexpectedExit default handler
     const exitCode = worker.process.exitCode
     const exitKey = worker |> workerExitKey
-    const err = new Error(`${ by(worker, WORKER) } died unexpectedly (code: ${ exitCode }, signal: ${ signal }, ${ exitKey }: ${ worker[exitKey] }, state: ${ worker.state })`)
+    const err = new Error(`${by(worker, WORKER)} died unexpectedly (code: ${exitCode}, signal: ${signal}, ${exitKey}: ${worker[exitKey]}, state: ${worker.state})`)
     err.name = 'WorkerDiedUnexpectedError';
-    `(total ${ this.disconnectCount } disconnect, ${ this.unexpectedCount } unexpected exit) ${ err.stack }` |> this.logger.level(ERROR)
+    `(total ${this.disconnectCount} disconnect, ${this.unexpectedCount} unexpected exit) ${err.stack}` |> this.logger.level(ERROR)
   }
   onReachReforkLimit() { // reachReforkLimit default handler
-    `worker died too fast (total ${ this.disconnectCount } disconnect, ${ this.unexpectedCount } unexpected exit)` |> this.logger.level(ERROR)
+    `worker died too fast (total ${this.disconnectCount} disconnect, ${this.unexpectedCount} unexpected exit)` |> this.logger.level(ERROR)
   }
 
   exitInfo({ worker, code, signal } = {}) {
