@@ -14,7 +14,7 @@ const agent = function (x) {
 }
 
 const test = async () => {
-  const result = await promiseLobby.call(agent, [{ time: 500 }, { time: 200 }], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+  const result = await promiseLobby.call(agent, [ { time: 500 }, { time: 300 }, { time: 200 } ], [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ])
   result |> delogger
 }
 

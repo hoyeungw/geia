@@ -1,7 +1,7 @@
 import { byMaster, byWorker }                from '@geia/by/src/by'
 import { DISCONNECT, EXIT, FORK, LISTENING } from '@geia/enum-events'
 import { Signaler }                          from '@geia/signaler/src/Signaler'
-import { says }                              from '@palett/says'
+import { says }                              from '@spare/says'
 import { deco }                              from '@spare/deco'
 import { decoString }                        from '@spare/logger'
 import { dateTime }                          from '@valjoux/timestamp-pretty'

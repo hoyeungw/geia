@@ -1,4 +1,4 @@
-import { says }         from '@palett/says'
+import { says }         from '@spare/says'
 import { delogger }     from '@spare/deco'
 import { linger }       from '@valjoux/linger'
 import { promiseLobby } from '../src/promiseLobby'

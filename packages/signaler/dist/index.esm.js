@@ -1,17 +1,14 @@
 import { EXIT } from '@geia/enum-events';
 import { APP, AGENT } from '@geia/enum-roles';
 import { SIGTERM, SIGKILL, SIGINT, SIGQUIT } from '@geia/enum-signals';
-import { says, ros } from '@palett/says';
+import { says, ros } from '@spare/says';
 import { dateTime } from '@valjoux/timestamp-pretty';
 import cluster from 'cluster';
 import co from 'co';
 import descendantPids from '@geia/descendant-pids';
 import awaitEvent from 'await-event';
 
-function createCommonjsModule(fn) {
-  var module = { exports: {} };
-	return fn(module, module.exports), module.exports;
-}
+var koSleep = {exports: {}};
 
 /**
  * Helpers.
@@ -193,9 +190,11 @@ function plural(ms, msAbs, n, name) {
   return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
 }
 
-var koSleep = createCommonjsModule(function (module, exports) {
+(function (module, exports) {
+  var ms$1 = ms;
+
   var sleep = function (time) {
-    time = isNaN(time) ? ms(time) : time;
+    time = isNaN(time) ? ms$1(time) : time;
     return new Promise(function (resolve, reject) {
       setTimeout(function () {
         resolve();
@@ -204,16 +203,14 @@ var koSleep = createCommonjsModule(function (module, exports) {
   };
 
   module.exports = sleep;
-});
+})(koSleep);
 
-var sleep = koSleep;
+var sleep = koSleep.exports;
 
 const terminate = function* (subProcess, timeout) {
-  var _subProcess$process;
-
   const {
     pid
-  } = (_subProcess$process = subProcess.process) !== null && _subProcess$process !== void 0 ? _subProcess$process : subProcess;
+  } = subProcess.process ?? subProcess;
   const pids = yield descendantPids(pid);
   yield [killProcess(subProcess, timeout), killDescendants(pids, timeout)];
 }; // kill process, if SIGTERM not work, try SIGKILL
@@ -292,9 +289,7 @@ class Signaler {
    * @param {SignalerConfig} o
    */
   static register(o) {
-    var _o$signals;
-
-    const signals = (_o$signals = o.signals) !== null && _o$signals !== void 0 ? _o$signals : [SIGINT, SIGQUIT, SIGTERM];
+    const signals = o.signals ?? [SIGINT, SIGQUIT, SIGTERM];
     if (!o.process) o.process = process;
     if (!o.workers) o.workers = cluster.workers;
 
@@ -326,8 +321,8 @@ function processOnSignal(signal) {
     try {
       var _ref2;
 
-      yield genCloseWorkers.call(context, context.workers, proc.env.LEA_APP_CLOSE_TIMEOUT || proc.env.LEA_MASTER_CLOSE_TIMEOUT || TIMEOUT);
-      yield genCloseAgent.call(context, context.agent, proc.env.LEA_AGENT_CLOSE_TIMEOUT || proc.env.LEA_MASTER_CLOSE_TIMEOUT || TIMEOUT);
+      yield genCloseWorkers.call(context, context.workers, proc.env.GEIA_APP_CLOSE_TIMEOUT || proc.env.GEIA_MASTER_CLOSE_TIMEOUT || TIMEOUT);
+      yield genCloseAgent.call(context, context.agent, proc.env.GEIA_AGENT_CLOSE_TIMEOUT || proc.env.GEIA_MASTER_CLOSE_TIMEOUT || TIMEOUT);
       _ref2 = `close done, exiting with code: ${ros('0')}`, logger(_ref2);
       proc.exit(0);
     } catch (e) {

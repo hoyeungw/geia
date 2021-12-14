@@ -1,7 +1,7 @@
 import { EXIT }                     from '@geia/enum-events'
 import { AGENT, APP }               from '@geia/enum-roles'
 import { SIGINT, SIGQUIT, SIGTERM } from '@geia/enum-signals'
-import { ros, says }                from '@palett/says'
+import { ros, says }                from '@spare/says'
 import { dateTime }                 from '@valjoux/timestamp-pretty'
 import cluster                      from 'cluster'
 import co                           from 'co'
@@ -51,8 +51,8 @@ export function processOnSignal(signal) {
   `receive signal ${ ros(signal) }, closing` |> logger
   co(function* () {
     try {
-      yield genCloseWorkers.call(context, context.workers, proc.env.LEA_APP_CLOSE_TIMEOUT || proc.env.LEA_MASTER_CLOSE_TIMEOUT || TIMEOUT)
-      yield genCloseAgent.call(context, context.agent, proc.env.LEA_AGENT_CLOSE_TIMEOUT || proc.env.LEA_MASTER_CLOSE_TIMEOUT || TIMEOUT);
+      yield genCloseWorkers.call(context, context.workers, proc.env.GEIA_APP_CLOSE_TIMEOUT || proc.env.GEIA_MASTER_CLOSE_TIMEOUT || TIMEOUT)
+      yield genCloseAgent.call(context, context.agent, proc.env.GEIA_AGENT_CLOSE_TIMEOUT || proc.env.GEIA_MASTER_CLOSE_TIMEOUT || TIMEOUT);
       `close done, exiting with code: ${ ros('0') }` |> logger
       proc.exit(0)
     }

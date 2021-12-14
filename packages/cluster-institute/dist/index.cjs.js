@@ -5,7 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var by = require('@geia/by');
 var enumEvents = require('@geia/enum-events');
 var enumRoles = require('@geia/enum-roles');
-var says = require('@palett/says');
+var says = require('@spare/says');
 var enumLoggers = require('@spare/enum-loggers');
 var logger = require('@spare/logger');
 var nullish = require('@typen/nullish');
@@ -54,52 +54,49 @@ const defer = global.setImmediate || process.nextTick;
 
 class Institute {
   /** @type {string} */
-
+  name = by.by(process, enumRoles.MASTER);
   /** @type {*} */
 
+  logger = says.says[this.name].attach(timestampPretty.dateTime);
   /** @type {number} */
 
+  count;
   /** @type {boolean} */
 
+  refork;
   /** @type {number} */
 
+  limit;
   /** @type {number} */
 
+  duration;
   /** @type {Array} */
 
+  reforks = [];
   /** @type {Object} */
 
+  attachedEnv;
   /** @type {Object} */
 
+  disconnects = {};
   /** @type {number} */
 
+  disconnectCount = 0;
   /** @type {number} */
-  // 1 min
+
+  unexpectedCount = 0; // 1 min
 
   /**
    * @param {ForkConfig} [p]
    */
+
   constructor(p = {}) {
-    var _p$count, _p$refork;
-
-    this.name = by.by(process, enumRoles.MASTER);
-    this.logger = says.says[this.name].attach(timestampPretty.dateTime);
-    this.count = void 0;
-    this.refork = void 0;
-    this.limit = void 0;
-    this.duration = void 0;
-    this.reforks = [];
-    this.attachedEnv = void 0;
-    this.disconnects = {};
-    this.disconnectCount = 0;
-    this.unexpectedCount = 0;
-
-    if (cluster__default['default'].isWorker) {
+    if (cluster__default["default"].isWorker) {
       return void 0;
     }
 
-    this.count = (_p$count = p.count) !== null && _p$count !== void 0 ? _p$count : os__default['default'].cpus().length - 1 || 1;
-    this.refork = (_p$refork = p.refork) !== null && _p$refork !== void 0 ? _p$refork : true;
+    this.count = p.count ?? (os__default["default"].cpus().length - 1 || 1);
+    this.refork = p.refork ?? true;
     this.limit = p.limit || 60;
     this.duration = p.duration || 60000;
     this.attachedEnv = p.env || {};
@@ -143,23 +140,23 @@ class Institute {
         settings.args = args;
       }
 
-      cluster__default['default'].setupMaster(settings);
+      cluster__default["default"].setupMaster(settings);
     }
 
-    cluster__default['default'].on(enumEvents.DISCONNECT, this.onDisconnect.bind(this));
-    cluster__default['default'].on(enumEvents.EXIT, this.onExit.bind(this)); // defer to set the listeners, so that these listeners can be customized
+    cluster__default["default"].on(enumEvents.DISCONNECT, this.onDisconnect.bind(this));
+    cluster__default["default"].on(enumEvents.EXIT, this.onExit.bind(this)); // defer to set the listeners, so that these listeners can be customized
 
     defer(() => {
       if (!process.listeners(enumEvents.UNCAUGHT_EXCEPTION).length) {
         process.on(enumEvents.UNCAUGHT_EXCEPTION, this.onUncaughtException.bind(this));
       }
 
-      if (!cluster__default['default'].listeners(UNEXPECTED_EXIT).length) {
-        cluster__default['default'].on(UNEXPECTED_EXIT, this.onUnexpectedExit.bind(this));
+      if (!cluster__default["default"].listeners(UNEXPECTED_EXIT).length) {
+        cluster__default["default"].on(UNEXPECTED_EXIT, this.onUnexpectedExit.bind(this));
       }
 
-      if (!cluster__default['default'].listeners(REACH_REFORK_LIMIT).length) {
-        cluster__default['default'].on(REACH_REFORK_LIMIT, this.onReachReforkLimit.bind(this));
+      if (!cluster__default["default"].listeners(REACH_REFORK_LIMIT).length) {
+        cluster__default["default"].on(REACH_REFORK_LIMIT, this.onReachReforkLimit.bind(this));
       }
     });
 
@@ -191,7 +188,7 @@ class Institute {
 
 
   getCluster() {
-    return cluster__default['default'];
+    return cluster__default["default"];
   }
 
   graduate({
@@ -199,11 +196,9 @@ class Institute {
     settings,
     gene
   } = {}) {
-    var _ref;
-
-    if (settings) cluster__default['default'].setupMaster(settings);
-    const worker = cluster__default['default'].fork(env);
-    worker[GENE] = (_ref = gene !== null && gene !== void 0 ? gene : settings) !== null && _ref !== void 0 ? _ref : cluster__default['default'].settings;
+    if (settings) cluster__default["default"].setupMaster(settings);
+    const worker = cluster__default["default"].fork(env);
+    worker[GENE] = gene ?? settings ?? cluster__default["default"].settings;
     return worker;
   }
   /** allow refork */
@@ -218,7 +213,7 @@ class Institute {
       this.reforks.shift();
     }
 
-    return this.withinForkLimit || (cluster__default['default'].emit(REACH_REFORK_LIMIT), false);
+    return this.withinForkLimit || (cluster__default["default"].emit(REACH_REFORK_LIMIT), false);
   }
 
   get withinForkLimit() {
@@ -230,47 +225,47 @@ class Institute {
   }
 
   onDisconnect(worker) {
-    var _ref2;
+    var _ref;
 
     const logger$1 = this.logger.level(worker[DISABLE_REFORK] ? enumLoggers.INFO : enumEvents.ERROR);
     const W = by.by(worker, enumRoles.WORKER);
     this.disconnectCount++;
-    _ref2 = `${W} disconnects (${logger.decoFlat(this.exitInfo({
+    _ref = `${W} disconnects (${logger.decoFlat(this.exitInfo({
       worker
-    }))})`, logger$1(_ref2);
+    }))})`, logger$1(_ref);
 
     if (worker !== null && worker !== void 0 && worker.isDead()) {
-      var _ref3;
+      var _ref2;
 
       // worker has terminated before disconnect
-      return void (_ref3 = `not forking, because ${W} exit event emits before disconnect`, logger$1(_ref3));
+      return void (_ref2 = `not forking, because ${W} exit event emits before disconnect`, logger$1(_ref2));
     }
 
     if (worker[DISABLE_REFORK]) {
-      var _ref4;
+      var _ref3;
 
       // worker has terminated by master, like egg-cluster master will set disableRefork to true
-      return void (_ref4 = `not forking, because ${W} will be killed soon`, logger$1(_ref4));
+      return void (_ref3 = `not forking, because ${W} will be killed soon`, logger$1(_ref3));
     }
 
     this.disconnects[worker.process.pid] = timestampPretty.dateTime();
 
     if (!this.allowRefork) {
-      var _ref5;
+      var _ref4;
 
-      _ref5 = `not forking new worker (refork: ${this.refork})`, logger$1(_ref5);
+      _ref4 = `not forking new worker (refork: ${this.refork})`, logger$1(_ref4);
     } else {
-      var _ref6;
+      var _ref5;
 
       const newWorker = this.graduate({
         settings: worker[GENE]
       });
-      _ref6 = `${timestampPretty.dateTime()} new ${by.by(newWorker, enumRoles.WORKER)} fork (state: ${newWorker.state})`, logger$1(_ref6);
+      _ref5 = `${timestampPretty.dateTime()} new ${by.by(newWorker, enumRoles.WORKER)} fork (state: ${newWorker.state})`, logger$1(_ref5);
     }
   }
 
   onExit(worker, code, signal) {
-    var _ref7;
+    var _ref6;
 
     const logger$1 = this.logger.level(worker[DISABLE_REFORK] ? enumLoggers.INFO : enumEvents.ERROR);
     const W = by.by(worker, enumRoles.WORKER);
@@ -280,7 +275,7 @@ class Institute {
       code,
       signal
     });
-    _ref7 = `${W} exit (${logger.decoFlat(info)}) isExpected (${isExpected})`, logger$1(_ref7);
+    _ref6 = `${W} exit (${logger.decoFlat(info)}) isExpected (${isExpected})`, logger$1(_ref6);
 
     if (isExpected) {
       return void delete this.disconnects[worker.process.pid];
@@ -295,50 +290,50 @@ class Institute {
     this.unexpectedCount++;
 
     if (!this.allowRefork) {
-      var _ref8;
+      var _ref7;
 
-      _ref8 = `not forking new worker (refork: ${this.refork})`, logger$1(_ref8);
+      _ref7 = `not forking new worker (refork: ${this.refork})`, logger$1(_ref7);
     } else {
-      var _ref9;
+      var _ref8;
 
       const newWorker = this.graduate({
         settings: worker[GENE]
       });
-      _ref9 = `new ${by.by(newWorker, enumRoles.WORKER)} fork (state: ${newWorker.state})`, logger$1(_ref9);
+      _ref8 = `new ${by.by(newWorker, enumRoles.WORKER)} fork (state: ${newWorker.state})`, logger$1(_ref8);
     }
 
-    cluster__default['default'].emit(UNEXPECTED_EXIT, worker, code, signal);
+    cluster__default["default"].emit(UNEXPECTED_EXIT, worker, code, signal);
   }
 
   onUncaughtException(err) {
-    var _ref10, _ref11, _ref12;
+    var _ref9, _ref10, _ref11;
 
     // uncaughtException default handler
     if (!err) {
       return;
     }
 
-    _ref10 = `master uncaughtException: ${err.stack}`, this.logger.level(enumEvents.ERROR)(_ref10);
-    _ref11 = `[error] ${err}`, this.logger(_ref11);
-    _ref12 = `(total ${this.disconnectCount} disconnect, ${this.unexpectedCount} unexpected exit)`, this.logger(_ref12);
+    _ref9 = `master uncaughtException: ${err.stack}`, this.logger.level(enumEvents.ERROR)(_ref9);
+    _ref10 = `[error] ${err}`, this.logger(_ref10);
+    _ref11 = `(total ${this.disconnectCount} disconnect, ${this.unexpectedCount} unexpected exit)`, this.logger(_ref11);
   }
 
   onUnexpectedExit(worker, code, signal) {
-    var _worker, _ref13;
+    var _worker, _ref12;
 
     // unexpectedExit default handler
     const exitCode = worker.process.exitCode;
     const exitKey = (_worker = worker, workerExitKey(_worker));
     const err = new Error(`${by.by(worker, enumRoles.WORKER)} died unexpectedly (code: ${exitCode}, signal: ${signal}, ${exitKey}: ${worker[exitKey]}, state: ${worker.state})`);
     err.name = 'WorkerDiedUnexpectedError';
-    _ref13 = `(total ${this.disconnectCount} disconnect, ${this.unexpectedCount} unexpected exit) ${err.stack}`, this.logger.level(enumEvents.ERROR)(_ref13);
+    _ref12 = `(total ${this.disconnectCount} disconnect, ${this.unexpectedCount} unexpected exit) ${err.stack}`, this.logger.level(enumEvents.ERROR)(_ref12);
   }
 
   onReachReforkLimit() {
-    var _ref14;
+    var _ref13;
 
     // reachReforkLimit default handler
-    _ref14 = `worker died too fast (total ${this.disconnectCount} disconnect, ${this.unexpectedCount} unexpected exit)`, this.logger.level(enumEvents.ERROR)(_ref14);
+    _ref13 = `worker died too fast (total ${this.disconnectCount} disconnect, ${this.unexpectedCount} unexpected exit)`, this.logger.level(enumEvents.ERROR)(_ref13);
   }
 
   exitInfo({

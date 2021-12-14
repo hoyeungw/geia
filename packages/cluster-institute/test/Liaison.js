@@ -1,7 +1,7 @@
 import { LoggerLegacy }               from '@dekor/logger'
 import { DISCONNECT, MESSAGE }        from '@geia/enum-events'
 import { AGENT, APP, MASTER, PARENT } from '@geia/enum-roles'
-import { ros, says }                  from '@palett/says'
+import { ros, says }                  from '@spare/says'
 import { deco }                       from '@spare/deco'
 import cluster                        from 'cluster'
 import sendMessage                    from 'sendmessage'

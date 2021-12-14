@@ -1,5 +1,5 @@
 import { MESSAGE }  from '@geia/enum-events'
-import { says }     from '@palett/says'
+import { says }     from '@spare/says'
 import { dateTime } from '@valjoux/timestamp-pretty'
 import cluster      from 'cluster'
 import { byWorker } from '../utils/writes'

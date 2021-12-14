@@ -1,5 +1,5 @@
 import { AGENT, MASTER, WORKER }       from '@geia/enum-roles'
-import { says }                        from '@palett/says'
+import { says }                        from '@spare/says'
 import { dateTime }                    from '@valjoux/timestamp-pretty'
 import { byAgent, byMaster, byWorker } from '../src/by'
 import { dyePid }                      from '../src/dyePid'

@@ -8,4 +8,4 @@ const descendantPids = pid => new Promise((resolve, reject) => {
   });
 });
 
-export default descendantPids;
+export { descendantPids as default };
