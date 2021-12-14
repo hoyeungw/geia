@@ -4,7 +4,7 @@ import { DyeFactory }     from '@palett/dye'
 import { BOLD }           from '@palett/enum-font-effects'
 import { INSTA, SUBTLE }  from '@palett/presets'
 import { Pigment }        from '@palett/projector'
-import { says }           from '@palett/says'
+import { says }           from '@spare/says'
 import { dateTime }       from '@valjoux/timestamp-pretty'
 import { HEX }            from '@palett/enum-color-space'
 
