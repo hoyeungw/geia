@@ -1,4 +1,4 @@
-# @geia/promise-lobby
+# @geia/contractor
 
 [![npm version][badge-npm-version]][url-npm]
 [![npm download monthly][badge-npm-download-monthly]][url-npm]
@@ -10,30 +10,30 @@
 [![github commit total][badge-github-commit-count]][url-github]
 
 [//]: <> (Shields)
-[badge-npm-version]: https://flat.badgen.net/npm/v/@geia/promise-lobby
-[badge-npm-download-monthly]: https://flat.badgen.net/npm/dm/@geia/promise-lobby
-[badge-npm-download-total]:https://flat.badgen.net/npm/dt/@geia/promise-lobby
-[badge-npm-dependents]: https://flat.badgen.net/npm/dependents/@geia/promise-lobby
-[badge-npm-license]: https://flat.badgen.net/npm/license/@geia/promise-lobby
-[badge-pp-install-size]: https://flat.badgen.net/packagephobia/install/@geia/promise-lobby
+[badge-npm-version]: https://flat.badgen.net/npm/v/@geia/contractor
+[badge-npm-download-monthly]: https://flat.badgen.net/npm/dm/@geia/contractor
+[badge-npm-download-total]:https://flat.badgen.net/npm/dt/@geia/contractor
+[badge-npm-dependents]: https://flat.badgen.net/npm/dependents/@geia/contractor
+[badge-npm-license]: https://flat.badgen.net/npm/license/@geia/contractor
+[badge-pp-install-size]: https://flat.badgen.net/packagephobia/install/@geia/contractor
 [badge-github-last-commit]: https://flat.badgen.net/github/last-commit/hoyeungw/geia
 [badge-github-commit-count]: https://flat.badgen.net/github/commits/hoyeungw/geia
 
 [//]: <> (Link)
-[url-npm]: https://npmjs.org/package/@geia/promise-lobby
-[url-pp]: https://packagephobia.now.sh/result?p=@geia/promise-lobby
+[url-npm]: https://npmjs.org/package/@geia/contractor
+[url-pp]: https://packagephobia.now.sh/result?p=@geia/contractor
 [url-github]: https://github.com/hoyeungw/geia
 
 ##### Fork cluster with configs
 
 #### Install
 ```console
-$ npm install @geia/promise-lobby
+$ npm install @geia/contractor
 ```
 
 #### Usage
 ```js
-import { Institute } from '@geia/promise-lobby'
+import { Institute } from '@geia/contractor'
 Institute.build({ exec:'path-to-worker/worker.js', env:{} })
 ```
 
