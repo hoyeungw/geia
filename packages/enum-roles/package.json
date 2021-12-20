@@ -1,6 +1,6 @@
 {
   "name": "@geia/enum-roles",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Enum of signals",
   "type": "module",
   "main": "dist/index.cjs",
