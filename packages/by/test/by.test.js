@@ -1,5 +1,5 @@
 import { CHEF, MAIN, MASTER }    from '@geia/enum-roles'
-import { ros, says }             from '@spare/says'
+import { ros, says }             from '@spare/logger'
 import { dateTime }              from '@valjoux/timestamp-pretty'
 import cluster                   from 'cluster'
 import threads                   from 'worker_threads'

@@ -11,224 +11,26 @@ var cluster = require('cluster');
 var co = require('co');
 var descendantPids = require('@geia/descendant-pids');
 var awaitEvent = require('await-event');
+var sleep = require('ko-sleep');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 var cluster__default = /*#__PURE__*/_interopDefaultLegacy(cluster);
 var co__default = /*#__PURE__*/_interopDefaultLegacy(co);
-var descendantPids__default = /*#__PURE__*/_interopDefaultLegacy(descendantPids);
 var awaitEvent__default = /*#__PURE__*/_interopDefaultLegacy(awaitEvent);
-
-var koSleep = {exports: {}};
-
-/**
- * Helpers.
- */
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var w = d * 7;
-var y = d * 365.25;
-/**
- * Parse or format the given `val`.
- *
- * Options:
- *
- *  - `long` verbose formatting [false]
- *
- * @param {String|Number} val
- * @param {Object} [options]
- * @throws {Error} throw an error if val is not a non-empty string or a number
- * @return {String|Number}
- * @api public
- */
-
-var ms = function (val, options) {
-  options = options || {};
-  var type = typeof val;
-
-  if (type === 'string' && val.length > 0) {
-    return parse(val);
-  } else if (type === 'number' && isFinite(val)) {
-    return options.long ? fmtLong(val) : fmtShort(val);
-  }
-
-  throw new Error('val is not a non-empty string or a valid number. val=' + JSON.stringify(val));
-};
-/**
- * Parse the given `str` and return milliseconds.
- *
- * @param {String} str
- * @return {Number}
- * @api private
- */
-
-
-function parse(str) {
-  str = String(str);
-
-  if (str.length > 100) {
-    return;
-  }
-
-  var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(str);
-
-  if (!match) {
-    return;
-  }
-
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
-
-  switch (type) {
-    case 'years':
-    case 'year':
-    case 'yrs':
-    case 'yr':
-    case 'y':
-      return n * y;
-
-    case 'weeks':
-    case 'week':
-    case 'w':
-      return n * w;
-
-    case 'days':
-    case 'day':
-    case 'd':
-      return n * d;
-
-    case 'hours':
-    case 'hour':
-    case 'hrs':
-    case 'hr':
-    case 'h':
-      return n * h;
-
-    case 'minutes':
-    case 'minute':
-    case 'mins':
-    case 'min':
-    case 'm':
-      return n * m;
-
-    case 'seconds':
-    case 'second':
-    case 'secs':
-    case 'sec':
-    case 's':
-      return n * s;
-
-    case 'milliseconds':
-    case 'millisecond':
-    case 'msecs':
-    case 'msec':
-    case 'ms':
-      return n;
-
-    default:
-      return undefined;
-  }
-}
-/**
- * Short format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-
-function fmtShort(ms) {
-  var msAbs = Math.abs(ms);
-
-  if (msAbs >= d) {
-    return Math.round(ms / d) + 'd';
-  }
-
-  if (msAbs >= h) {
-    return Math.round(ms / h) + 'h';
-  }
-
-  if (msAbs >= m) {
-    return Math.round(ms / m) + 'm';
-  }
-
-  if (msAbs >= s) {
-    return Math.round(ms / s) + 's';
-  }
-
-  return ms + 'ms';
-}
-/**
- * Long format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-
-function fmtLong(ms) {
-  var msAbs = Math.abs(ms);
-
-  if (msAbs >= d) {
-    return plural(ms, msAbs, d, 'day');
-  }
-
-  if (msAbs >= h) {
-    return plural(ms, msAbs, h, 'hour');
-  }
-
-  if (msAbs >= m) {
-    return plural(ms, msAbs, m, 'minute');
-  }
-
-  if (msAbs >= s) {
-    return plural(ms, msAbs, s, 'second');
-  }
-
-  return ms + ' ms';
-}
-/**
- * Pluralization helper.
- */
-
-
-function plural(ms, msAbs, n, name) {
-  var isPlural = msAbs >= n * 1.5;
-  return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
-}
-
-(function (module, exports) {
-  var ms$1 = ms;
-
-  var sleep = function (time) {
-    time = isNaN(time) ? ms$1(time) : time;
-    return new Promise(function (resolve, reject) {
-      setTimeout(function () {
-        resolve();
-      }, time);
-    });
-  };
-
-  module.exports = sleep;
-})(koSleep);
-
-var sleep = koSleep.exports;
+var sleep__default = /*#__PURE__*/_interopDefaultLegacy(sleep);
 
 const terminate = function* (subProcess, timeout) {
   const {
     pid
   } = subProcess.process ?? subProcess;
-  const pids = yield descendantPids__default["default"](pid);
+  const pids = yield descendantPids.descendantPids(pid);
   yield [killProcess(subProcess, timeout), killDescendants(pids, timeout)];
 }; // kill process, if SIGTERM not work, try SIGKILL
 
 function* killProcess(subProcess, timeout) {
   subProcess.kill(enumSignals.SIGTERM);
-  yield Promise.race([awaitEvent__default["default"](subProcess, enumEvents.EXIT), sleep(timeout)]);
+  yield Promise.race([awaitEvent__default["default"](subProcess, enumEvents.EXIT), sleep__default["default"](timeout)]);
   if (subProcess.killed) return; // SIGKILL: http://man7.org/linux/man-pages/man7/signal.7.html
   // worker: https://github.com/nodejs/node/blob/master/lib/internal/cluster/worker.js#L22
   // subProcess.kill is wrapped to subProcess.destroy, it will wait to disconnected.
@@ -246,7 +48,7 @@ function* killDescendants(pids, timeout) {
   let unterminated = [];
 
   while (Date.now() - start < timeout - checkInterval) {
-    yield sleep(checkInterval);
+    yield sleep__default["default"](checkInterval);
     unterminated = getUnterminatedProcesses(pids);
     if (!unterminated.length) return;
   }

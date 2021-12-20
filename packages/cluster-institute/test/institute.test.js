@@ -1,16 +1,16 @@
 import { byMaster, byWorker }                from '@geia/by/src/by'
 import { DISCONNECT, EXIT, FORK, LISTENING } from '@geia/enum-events'
 import { Signaler }                          from '@geia/signaler/src/Signaler'
-import { says }                              from '@spare/says'
 import { deco }                              from '@spare/deco'
 import { decoString }                        from '@spare/logger'
+import { says }                              from '@spare/says'
 import { dateTime }                          from '@valjoux/timestamp-pretty'
 import cluster                               from 'cluster'
-import { Institute }                         from '../src/Institute'
+import { Institute }                         from '../src/Institute.js'
 
 const test = async () => {
   const logger = says[byMaster(process)].attach(dateTime)
-  decoString('================================ Institute test ================================') |> logger
+  logger(decoString('================================ Institute test ================================'))
 
   const institute = Institute
     .build({
@@ -23,17 +23,17 @@ const test = async () => {
   institute
     .getCluster()
     .on(FORK, worker => {
-      worker.disableRefork = true;
-      `[ ${byWorker(worker)} ] new worker start` |> says[byWorker(worker)].p(dateTime())
+      worker.disableRefork = true
+      says[byWorker(worker)].p(dateTime())(`[ ${byWorker(worker)} ] new worker start`)
     })
     .on(LISTENING, worker => {
-      `[${byWorker(worker)} ] new worker listening` |> says[byWorker(worker)].p(dateTime())
+      says[byWorker(worker)].p(dateTime())(`[${byWorker(worker)} ] new worker listening`)
       worker.send('Hello worker:' + deco({ id: worker.id, pid: worker.process.pid }))
     })
-    .on(DISCONNECT, worker => {`[${byWorker(worker)}] on [${DISCONNECT}] disconnected` |> logger })
+    .on(DISCONNECT, worker => {logger(`[${byWorker(worker)}] on [${DISCONNECT}] disconnected`) })
     .on(EXIT, (worker, code, signal) => {
-      `[${byWorker(worker)}] on [${EXIT}] exited with ${deco(
-        { code, signal, exitCode: worker.process.exitCode })}` |> logger
+      logger(`[${byWorker(worker)}] on [${EXIT}] exited with ${deco(
+        { code, signal, exitCode: worker.process.exitCode })}`)
     })
   Signaler.register({
     process: process,

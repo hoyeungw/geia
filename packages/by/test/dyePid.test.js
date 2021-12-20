@@ -1,6 +1,6 @@
 import { rand }   from '@aryth/rand'
 import { logger } from '@spare/logger'
-import { dyePid } from '../src/dyePid'
+import { dyePid } from '../src/dyePid.js'
 
 const test = () => {
   const candidates = [
@@ -10,7 +10,7 @@ const test = () => {
     rand(100000)
   ]
   for (let candidate of candidates) {
-    candidate |> dyePid |> logger
+    logger(dyePid(candidate))
   }
 }
 

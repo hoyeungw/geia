@@ -1,11 +1,11 @@
-import descendantPids       from '@geia/descendant-pids'
+import { descendantPids }       from '@geia/descendant-pids'
 import { EXIT }             from '@geia/enum-events'
 import { SIGKILL, SIGTERM } from '@geia/enum-signals'
 import awaitEvent           from 'await-event'
-import sleep                from 'mz-modules/sleep'
+import sleep                from 'ko-sleep'
 
 export const terminate = function* (subProcess, timeout) {
-  const { pid } = (subProcess.process ?? subProcess)
+  const { pid } = ( subProcess.process ?? subProcess )
   const pids = yield descendantPids(pid)
   yield [
     killProcess(subProcess, timeout),
@@ -16,12 +16,12 @@ export const terminate = function* (subProcess, timeout) {
 // kill process, if SIGTERM not work, try SIGKILL
 function* killProcess(subProcess, timeout) {
   subProcess.kill(SIGTERM)
-  yield Promise.race([awaitEvent(subProcess, EXIT), sleep(timeout)])
+  yield Promise.race([ awaitEvent(subProcess, EXIT), sleep(timeout) ])
   if (subProcess.killed) return;
   // SIGKILL: http://man7.org/linux/man-pages/man7/signal.7.html
   // worker: https://github.com/nodejs/node/blob/master/lib/internal/cluster/worker.js#L22
   // subProcess.kill is wrapped to subProcess.destroy, it will wait to disconnected.
-  (subProcess.process || subProcess).kill(SIGKILL)
+  ( subProcess.process || subProcess ).kill(SIGKILL)
 }
 
 // kill all children processes, if SIGTERM not work, try SIGKILL
@@ -44,8 +44,7 @@ function* killDescendants(pids, timeout) {
 
 function kill(pids, signal) {
   for (const pid of pids) {
-    try { process.kill(pid, signal) }
-    catch (_) {} // ignore
+    try { process.kill(pid, signal) } catch (_) {} // ignore
   }
 }
 

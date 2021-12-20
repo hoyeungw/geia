@@ -2,8 +2,12 @@
   "name": "@geia/contractor",
   "version": "0.1.3",
   "description": "Limit concurrency of an array of class instance whose async method is to be called",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "exports": {
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "files": [
     "dist"
   ],
