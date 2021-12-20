@@ -5,7 +5,7 @@ import { HEX }                         from '@palett/enum-color-space'
 import { ros }                         from '@spare/says'
 import { NUM, OBJ }                    from '@typen/enum-data-types'
 import { nullish }                     from '@typen/nullish'
-import { dyePid, dyeThreadId }         from './dyePid'
+import { dyePid, dyeThreadId }         from './dyePid.js'
 // import cluster from 'cluster'
 // import threads from 'worker_threads'
 const dyeFactory = DyeFactory.prep(HEX)
