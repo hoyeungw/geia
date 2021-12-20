@@ -1,6 +1,6 @@
 {
   "name": "@geia/promise-lobby",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Limit concurrency of an array of class instance whose async method is to be called",
   "type": "module",
   "main": "dist/index.cjs",
